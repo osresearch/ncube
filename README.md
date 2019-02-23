@@ -2069,6 +2069,7 @@ below:
 ```
   | OPCODE | REFERENCE 1 | REFERENCE 2|
 Low address                        High address
+```
 
 In the physical representation shown above REFERENCE 2 is both one of the
 operands and the result. For example, if the OPCODE indicated Subtract
@@ -2094,7 +2095,7 @@ the operation performed is
 The order of address evaluation is from the low address so that the
 address for A is evaluated before the address for B.
 
-### Opcode Formats
+### 4.7.1 Opcode Formats
 
 All opcodes are one byte long and each operation type group has at least
 one reserved code for future expansion. The byte is divided into two
