@@ -1,8 +1,6 @@
-High performance computer system
-====
+# High performance computer system
 
-Abstract
----
+# Abstract
 
 A parallel processor comprised of a plurality of processing nodes (10),
 each node including a processor (100-114) and a memory (116). Each
@@ -48,15 +46,14 @@ Events
 * 2009-05-12 Anticipated expiration
 * 2019-02-22 Application status is Expired - Lifetime
 
-BACKGROUND OF THE INVENTION
-===
+# BACKGROUND OF THE INVENTION
 
-1. Field of the Invention
+## Field of the Invention
 
 The invention relates to data-processing systems, and more particularly,
 to a high-performance, parallel-processing system.
 
-2. Description of the Prior Art
+## Description of the Prior Art
 
 In the past, data-processing systems utilizing parallel processing
 have met with limited commercial success. Consider, for example, the
@@ -110,8 +107,7 @@ processing, with a system performance that is above the level of modern
 supercomputers, but is within the price range of a small mainframe
 computer.
 
-BRIEF SUMMARY OF THE INVENTION
-----
+# BRIEF SUMMARY OF THE INVENTION
 
 Briefly, the above object is accomplished in accordance with an embodiment
 of the present invention as follows. A data-processing architecture
@@ -158,8 +154,7 @@ even if several processors fail the remaining processors can be logically
 reconfigured into an operational array.
 
 
-BRIEF DESCRIPTION OF THE DRAWINGS
----
+# BRIEF DESCRIPTION OF THE DRAWINGS
 
 The foregoing and other objects, features, and advantages of the invention
 will be apparent from the following detailed description of a preferred
@@ -215,11 +210,9 @@ FIG. 14 is a detailed block diagram of a single dual ported-processing
 node of the system control board interface shown in FIG. 13.
 
 
-PART I. DATA PROCESSOR ARCHITECTURE
-===
+# PART I. DATA PROCESSOR ARCHITECTURE
 
-1. References and Definition of Terms
----
+## References and Definition of Terms
 
 For background information see "The Extension of Object-Oriented Languages
 to a Homogeneous, Concurrent Architecture", Thesis by Charles Richard
@@ -237,8 +230,8 @@ Information about Intel products referred to in this specification can be
 obtained by writing to Intel Corporation, 3065 Bowers Ave., Santa Clara,
 Calif. 95051.
 
-2. INTRODUCTION
----
+## INTRODUCTION
+
 The architecture of the system in which the present invention is
 embodied uses up to 1024 identical high speed processors (processing
 nodes) connected in an array to work on a single problem. Each node is a
@@ -261,10 +254,9 @@ the backplane, the architecture can support a larger array. Also by
 connecting systems together with an interprocessor Link it is possible
 to use multiple systems in parallel or as a very powerful pipeline.
 
-3. THE SYSTEM
----
+## THE SYSTEM
 
-3.1 System Overview
+### System Overview
 
 One embodiment of a system in which the principles of the present
 invention are practiced is described in detail in Part II of this
@@ -338,20 +330,20 @@ significant bit are connected (e.g. 010...01 must be connected to
 This formulation of the hypercube illustrates two of its most important
 properties:
 
-1. The number of interconnections per node grows as the Log2 of the
+* The number of interconnections per node grows as the Log2 of the
 number of processors which allows for more direct interconnections than
 most array schemes have.
 
-2. An order N hypercube is made of 2 order (N-1) hypercubes. This allows
+* An order N hypercube is made of 2 order (N-1) hypercubes. This allows
 for several beneficial features
 
-a) the system can be modular since a large array is logically equivalent
+  * the system can be modular since a large array is logically equivalent
 to a small one;
 
-b) software can be written for a generic hypercube independently of its
+  * software can be written for a generic hypercube independently of its
 order--the program will simply run faster on a larger array;
 
-c) a large system can be partitioned by the Operating System among
+  * a large system can be partitioned by the Operating System among
 multiple users so that each has a smaller hypercube to run user software.
 
 These advantages are not available in a typical toroidal grid (lattice)
@@ -360,7 +352,7 @@ grids are very useful in many applications, it is important to note that
 a hypercube can be mapped onto either grid simply by ignoring some of
 the available communication links.
 
-3.2.1 System Control Board
+### System Control Board
 
 At least one System Clock board (14), shown in FIG. 1, must be installed
 in the every system and there can be up to 8 per system. Its primary
@@ -384,7 +376,7 @@ shown in FIG. 12, and is described in detail in section 8.9.
 The sections below describe the architecture of the System Control in
 more detail.
 
-3.2.1.1 Central Processor
+#### Central Processor
 
 The central processor of the System Control is an Intel 80286. This
 is a high performance 16 bit processor that has a compatibility mode
@@ -395,7 +387,7 @@ programming the Intel 80286 see Intel's iAPX 286 Programmer's Reference
 Manual, which can be obtained from Intel Corporation, 3065 Bowers Ave.,
 Santa Clara, Calif. 95051.
 
-3.2.1.2 System Programmable Read-Only Memory (PROM)
+#### System Programmable Read-Only Memory (PROM)
 
 The System Control has 8 sockets for PROM (72) which may be loaded
 with devices from Intel 2764's up to Intel 27512's. The PROM resides at
@@ -414,22 +406,19 @@ CHIP      BANK 1 (top)   BANK 0
 The PROM's are programmed by and contain a monitor described in section
 5.2, that includes the following functions:
 
-1) a bootstrap loader
+* a bootstrap loader
+* a debugger
+* a diagnostic package
+* an offline system backup/restore facility
 
-2) a debugger
-
-3) a diagnostic package
-
-4) an offline system backup/restore facility
-
-3.2.1.3 Global Random Access Memory (RAM)
+#### Global Random Access Memory (RAM)
 
 There are 2 megabytes of global dual ported memory (214) on the System
 Control Board shown in FIG. 12. This memory can be directly accessed
 by both the Intel 80286 (block 222) and the SMD disk controller (216)
 and resides at location 0 to 1FFFF in the system memory space.
 
-3.2.1.4 Local I/O Array
+#### Local I/O Array
 
 There is a local array interface (212) of 16 processing nodes on the
 System Control Board. Each node consists of a processor and 128 Kbytes of
@@ -475,7 +464,7 @@ node in one cube to a node in the other. However, since all the memory
 is in the Intel 80286 memory space, it is simple and fast to use the
 central processor or the DMA processor to move the data.
 
-3.2.1.5 SBX Connectors
+#### SBX Connectors
 
 There are three Intel iSBX™ connectors (78) on the system control
 board. Intel and other companies make a wide range of small boards
@@ -525,7 +514,7 @@ Device      Data   Registers  Addresses
      8      8      MCS1       70,72,74,76,78,7A,7C,7E
 ```
 
-3.2.1.6 Printer (Centronics) Port
+#### Printer (Centronics) Port
 
 There is one high speed printer I/O port on the System Control Board. It
 supports the Centronics protocol with 8 bits of data and 4 bits of
@@ -553,7 +542,7 @@ bit 14:     reserved
 bit 15:     1 = main power (-5) good
 ```
 
-3.2.1.7 Direct Memory Access (DMA) Controller
+#### Direct Memory Access (DMA) Controller
 
 The System Control Board has an Intel 82258 ADMA device (80) that controls
 the Direct Memory Access in the system. It is specifically intended to
@@ -601,7 +590,7 @@ block in memory is shown below: ##STR2##
 
 TODO: figure
 
-3.2.1.8 Serial Channels
+#### Serial Channels
 
 The System Control Board shown in FIG. 12 has 8 serial channels that are
 controlled by four Intel 8530 Serial Communications Controllers (82), each
@@ -693,7 +682,7 @@ Table:      Baud Rate    Time Constant
       50           1150
 ```
 
-3.2.1.9 SMD Disk Controller
+#### SMD Disk Controller
 
 The System Control has an SMD disk controller unit (216). It is capable
 of controlling up to four standard SMD disks drives. Data is accessed
@@ -701,8 +690,9 @@ in blocks of 1024 bytes at a rate of 1 Megabyte per second. The disk
 controller unit consists of 6 registers in the I/O address space which
 are described below.
 
+*  Command/Status Register:
+
 ```
-1)  Command/Status Register:
 I/O Address: 00
 Write: Command ##STR3##
 Read: Status
@@ -724,8 +714,8 @@ Read: Status
   bit 15: 1 = Disk Fault
 ```
 
+*  Control
 ```
-2)  Control
 I/O Address: 02
 Read and Write
   bit 0: \___ Unit Select
@@ -738,17 +728,17 @@ Read and Write
   bit 7:  1 = Data Strobe Late
 ```
 
+*  Low Memory Address
 ```
-3)  Low Memory Address
 I/O Address: 04
 Read and Write (Read may not be valid if controller is busy)
-  bit 0:  \
+  bit 0:   \
   ...      } Low order part of memory addres
   bit 15: /
 ```
 
+* High Memory Address
 ```
-4)  High Memory Address
 I/O Address: 06
 Write
   bit 0:  \
@@ -771,8 +761,8 @@ Read
   bit 15: Reserved
 ```
 
+*  Head/Sector
 ```
-5)  Head/Sector
 I/O Address: 08
 Read and Write
   bit 0:  \
@@ -789,8 +779,8 @@ Read and Write
   bit 15: Reserved
 ```
 
+*  Cylinder
 ```
-6)  Cylinder
 I/O Address: 0A
 Read and Write
   bit 0:  \
@@ -809,28 +799,27 @@ from these addresses yields a system ID (see 3.3.1.10). The interrupt
 indicates that a disk access has completed. The addresses and interrupt
 number are given below.
 
-1) Write 18: Disable disk controller
+* Write 18: Disable disk controller
+* Write 1A: Enable disk controller
+* Interrupt 83 (vector address 14C): Disk access complete
 
-2) Write 1A: Enable disk controller
-
-3) Interrupt 83 (vector address 14C): Disk access complete
-
-3.2.1.10 System Control
+#### System Control
 
 There is a set of I/O addresses associated with various aspects of system
 control. The controls include power supply monitoring and sequencing,
 error sensing and signaling, and board resets. All of the addresses and
 controls are described below:
 
+*  Array Reset
 ```
-1)  Array ResetI/O Address: 10
+I/O Address: 10
 Read and Write (Write causes reset)
   for k = 0,1,...,15
     bit k: Resets Board k in Connector Jn, n = 20 - k
 ```
 
+*  Control
 ```
-2)  Control
 I/O Address: 12
 Read and Write
   bit 0       0 =    Enable system memory error              correction
@@ -851,8 +840,8 @@ Read and Write
   bit 15:     0 =    Fans on (1 = Fans off)
 ```
 
+*  Reset/Status
 ```
-3)  Reset/Status
 I/O Address: 16
 Write--Reset
   Reset local array ECC error (data = do not care)
@@ -876,8 +865,8 @@ Read--Status
   bit 15:     0 =    Power fail interrupt
 ```
 
+* Disk Disable/System ID
 ```
-4)  Disk Disable/System ID
 I/O Address: 18
 Write--Disable
   Disable disk controller (data = do not care)
@@ -886,8 +875,8 @@ Read--System ID
   bits 3 to 15:  Low order part of system ID
 ```
 
+* Disk Enable/System ID
 ```
-5)  Disk Enable/System ID
 I/O Address: 1A
 Write--Enable
   Enable disk controller (data = do not care)
@@ -895,8 +884,8 @@ Read--System ID
   bits 0 to 7:   High order part of system ID
 ```
 
+* Reset/ECC
 ```
-6)  Reset/ECC
 I/O Address: 1C
 Write--Reset
   Reset system memory ECC error (data = do not care)
@@ -922,7 +911,7 @@ bits    0     0      1     0   1    0    1   0    1
   D =    Double bit error
 ```
 
-3.2.1.11 Temperature Sensors
+#### Temperature Sensors
 
 The system contains sixteen temperature sensing devices located throughout
 the enclosure. They are used to prevent system damage caused by over
@@ -947,13 +936,13 @@ bits 0 to 7: Measured temperature
 
 bits 8 to 15: Reserved
 
-3.2.1.12 Real Time Clock
+#### Real Time Clock
 
 The System Control board has a real time clock (84) that is controlled
 and sensed by writing and reading the following I/O addresses.
 
+* Control/Status
 ```
-1) Control/Status
 I/O Address: 40
 Write--Control
   bit 0:     0 = Interrupt run; 1 = Interrupt stop
@@ -970,8 +959,8 @@ Read--Status
   bits 4 to 15: Reserved
 ```
 
+* Set/Interrupt
 ```
-2) Set/Interrupt
 I/O Address: 5E
 Read and Write
   If Control/Status (40) bit 0 = 0
@@ -998,8 +987,8 @@ No Interrupt       000
 60.0 Seconds       111
 ```
 
+* Time Set/Read
 ```
-3) Time Set/Read
 Write (Set) and Read (Sense)
 I/O Address  Function
 42           Tenths of seconds (Read only)
@@ -1021,7 +1010,7 @@ I/O Address  Function
 The interrupt associated with the Real Time Clock is: Interrupt #72
 (Vector at memory address 120)
 
-3.2.1.13 Timer
+#### Timer
 
 The System Control has two timers in addition to the Real Time Clock. They
 are provided by an Intel 8254 that has 4 I/O addresses associated
@@ -1040,7 +1029,7 @@ Control (Write Only)          0F6
     Time Base = 5.425 * 10 ** -5
 ```
 
-3.2.1.14 Interrupt Controllers
+#### Interrupt Controllers
 
 The System Control provides a full range of interrupts for various
 system control functions. These interrupts are handled by five Intel
@@ -1054,59 +1043,59 @@ handle. Section 3.3.2.1.14 lists the interrupts and vector addresses
 that are generated by these controllers. Programming details for the
 8259A can be found in Intel's Data Catalogue.
 
-1) Master Interrupt Controller
+* Master Interrupt Controller
 
 I/O Addresses:
-* C0: ICW1,OCW2,OCW3 (byte access only)
-* C2: ICW2-4, Mask Register (byte access only)
+  * C0: ICW1,OCW2,OCW3 (byte access only)
+  * C2: ICW2-4, Mask Register (byte access only)
 
 Connected Interrupts:
-* 0: Schedule Timer
-* 1: Serial Channel Controller 0
-* 2: Serial Channel Controller 1
-* 3: Serial Channel Controller 2
-* 4: Serial Channel Controller 3
-* 5: Slave Interrupt Controller 0
-* 6: Slave Interrupt Controller 1
-* 7: Reserved (grounded)
+  * 0: Schedule Timer
+  * 1: Serial Channel Controller 0
+  * 2: Serial Channel Controller 1
+  * 3: Serial Channel Controller 2
+  * 4: Serial Channel Controller 3
+  * 5: Slave Interrupt Controller 0
+  * 6: Slave Interrupt Controller 1
+  * 7: Reserved (grounded)
 
-2) Slave Interrupt Controller 0
+* Slave Interrupt Controller 0
 
 I/O Addresses:
-* CB: ICW1,OCW2,OCW3 (byte access only)
-* CA: ICW2-4, Mask Register (byte access only)
+  * CB: ICW1,OCW2,OCW3 (byte access only)
+  * CA: ICW2-4, Mask Register (byte access only)
 
 Connected Interrupts:
-* 0: Real Time Clock
-* 1: Local Array Error
-* 2: Main Array Error (see 4 below)
-* 3: DMA Channel 0 (end of DMA)
-* 4: DMA Channel 1 (end of DMA)
-* 5: DMA Channel 2 (end of DMA)
-* 6: DMA Channel 3 (end of DMA)
-* 7: Reserved (grounded)
+  * 0: Real Time Clock
+  * 1: Local Array Error
+  * 2: Main Array Error (see 4 below)
+  * 3: DMA Channel 0 (end of DMA)
+  * 4: DMA Channel 1 (end of DMA)
+  * 5: DMA Channel 2 (end of DMA)
+  * 6: DMA Channel 3 (end of DMA)
+  * 7: Reserved (grounded)
 
-3) Slave Interrupt Controller 1
+* Slave Interrupt Controller 1
 
 I/O Addresses:
-* CC: ICW1,OCW2,OCW3 (byte access only)
-* CE: ICW2-4, Mask Register (byte access only)
+  * CC: ICW1,OCW2,OCW3 (byte access only)
+  * CE: ICW2-4, Mask Register (byte access only)
 
 Connected Interrupts:
-* 0: SBX 3 Interrupt
-* 1: SBX 2 Interrupt
-* 2: SBX 1 Interrupt
-* 3: Disk Controller Interrupt
-* 4: Power Down Interrupt
-* 5: Printer Interrupt
-* 6: Temperature Sense Ready Interrupt
-* 7: Reserved (grounded)
+  * 0: SBX 3 Interrupt
+  * 1: SBX 2 Interrupt
+  * 2: SBX 1 Interrupt
+  * 3: Disk Controller Interrupt
+  * 4: Power Down Interrupt
+  * 5: Printer Interrupt
+  * 6: Temperature Sense Ready Interrupt
+  * 7: Reserved (grounded)
 
-4) Main Array Interrupt Controller
+* Main Array Interrupt Controller
 
 I/O Addresses:
-* C4: ICW1,OCW2,OCW3 (16 bit access only)
-* C6: ICW2-4, Mask Register (16 bit access only)
+  * C4: ICW1,OCW2,OCW3 (16 bit access only)
+  * C6: ICW2-4, Mask Register (16 bit access only)
 
 Connected Interrupts:
 
@@ -1122,7 +1111,7 @@ Level       Low Data Byte High Data Byte
 7           Board 7 (J13) Board 15 (J5)
 ```
 
-3.2.1.15 Interrupts
+#### Interrupts
 
 The System Control generates and handles a complete set of interrupts
 for managing the system. The interrupts are defined in the table below.
@@ -1196,7 +1185,7 @@ Vector #  Address  Function
 87     15C      Reserved
 ```
 
-3.2.1.16 Interrupts
+#### Interrupts
 
 The System Control Board supports the Intel 80287 Math Coprocessor (90)
 as an option. The I/O addresses listed below are activated by invoking
@@ -1205,11 +1194,11 @@ the 80287 are in Intel's Microprocessor Manual.
 
 80287 I/O Addresses: F8 to FF
 
-3.2.1.17 Initial State
+#### Initial State
 
 The System Control Board is initialized on system reset.
 
-3.2.1.18 System Summary
+#### System Summary
 
 The following tables summarize the memory and I/O address space of the
 System Control.
@@ -1239,7 +1228,7 @@ Math Coprocessor:                0F8 to 0FF
 DMA Controller:                  ??? to ???
 ```
 
-3.2.2 Graphics Processor
+### Graphics Processor
 
 A Graphics Processor is used to control a raster scan CRT display. This
 provides a very effective way for displaying and dealing with the very
@@ -1257,7 +1246,7 @@ frame of display data in excess of 60 times a second (faster than the
 display refresh rate). This makes the system ideal for a wide range of
 graphics applications.
 
-3.2.3 Interprocessor Link
+### Interprocessor Link
 
 Two or more systems are interconnected through an I/O channel (an order
 7 subcube) in each system. This permits the implementation of arbitrary
@@ -1266,10 +1255,9 @@ outputs of one machine feeds the input of the next and the last system
 drives the displays.
 
 
-4 THE PROCESSOR
----
+# THE PROCESSOR
 
-4.1 Introduction
+## Introduction
 
 The processor array is made up of 2N nodes where N is 6,7,8,9 or 10.
 Each processing node (FIG. 4) consists of a general purpose 32
@@ -1277,9 +1265,9 @@ bit processor (including 32 and 64 bit floating point instructions),
 128K bytes of ECC memory and 11 communication channels to support the
 hypercube interconnection scheme and the 8 system I/O channels.
 
-4.2 Architecture Overview
+## Architecture Overview
 
-4.2.1 Data Representation
+### Data Representation
 
 The processor recognizes two main classes of data: integers and
 reals. Integers are represented in standard 2's complement form and
@@ -1296,7 +1284,7 @@ In addition to the various data formats, the processor recognizes and
 manipulates addresses. Addresses are simply 32 bit unsigned values that
 point to individual bytes in a linear address space.
 
-4.2.2 Registers, Interrupts and Communication
+### Registers, Interrupts and Communication
 
 The processor's instructions operate on data in main memory (as described
 above) or on data in 32 bit registers. The processor contains three
@@ -1344,7 +1332,7 @@ counter (PC) are pushed on the stack. Then PS and PC are loaded with
 new values from the appropriated entry (indexed by the interrupt number)
 in the interrupt vector table in low memory.
 
-4.2.3 Instruction Formats and Addressing Modes
+### Instruction Formats and Addressing Modes
 
 An instruction consists of an operation code followed by zero and one
 or two data references:
@@ -1384,13 +1372,13 @@ autodecrement and offset addressing with both the program counter (PC)
 and the stack pointer (SP). As with instructions there is a reserved
 "escape" code defined for the mode selector field.
 
-4.3 Data Representation
+## Data Representation
 
 The processor recognizes two classes of data: integrers and reals
 (floating point number). There are three types of integers and two types
 of reals.
 
-4.3.1 Integers
+### Integers
 
 The three integer data types are all represented in standard 2's
 complement. They are called Byte (B), Halfword (H) and Word (W) and are
@@ -1407,7 +1395,7 @@ quantities. Addresses are also treated by the processor as unsigned
 values. The address space is logically a linear set of bytes from address
 0 to 2^32-1; thus addresses are unsigned 32 bit integers (Words).
 
-4.3.2 Reals
+### Reals
 
 The floating point implementation in the processor conforms to the IEEE
 Binary Floating Point Standard (P754). With the floating point arithmetic
@@ -1527,13 +1515,13 @@ crucial instructions. Square root is correctly rounded and as fast as
 divided. Remainder is an exact operation and permits argument reduction
 for periodic functions with no roundoff error.
 
-4.4 Registers
+## Registers
 
 The following sections describe three types of registers in the processor:
 the General registers, the Input/Output registers and the Processor
 registers.
 
-4.4.1 General Registers
+### General Registers
 
 The 16 General registers (128), shown in FIG. 9A, are labeled R0 to
 R15. They are 32 bits wide and are used for data and addresses. They are
@@ -1545,7 +1533,7 @@ designated register, Ri, and the high order part resides in Ri+1. The
 numbers "wrap around" so that if a Longreal is moved to R15 the high
 order section is found in R0.
 
-4.4.2 Input/Output Registers
+### Input/Output Registers
 
 In a processor, each of the 11 input and output ports (48), shown in
 FIG. 5, is an independent Direct Memory Access (DMA) channel and has two
@@ -1567,7 +1555,7 @@ value. All of the ports are general except one input and one output port
 are designated "host" (H) and are normally used to communicate over the
 I/O bus to the System Control Boards.
 
-4.4.3 Processor Registers
+### Processor Registers
 
 The Processor registers are the third type of register in the
 processor. All Processor registers are 32 bits wide. They contain all the
@@ -1800,7 +1788,7 @@ in memory an error is noted. After the count goes to zero instead of
 signaling a "ready" interrupt, the corresponding flag is set to one and an
 "input error" interrupt is generated. This register is read only.
 
-4.5 Interrupts and Exceptions
+## Interrupts and Exceptions
 
 The processor has a powerful vectored interrupt facility and generates
 several kinds of interrupts: program exceptions, software facilities,
@@ -1838,7 +1826,7 @@ of its argument).
 All interrupts are defined below. The number at the left is the interrupt
 number.
 
-4.5.1 Interrupt Definitions
+### Interrupt Definitions
 
 * 0) RESERVED
 
@@ -1950,7 +1938,7 @@ one of these interrupts is generated.
 * 127) IEH: Input Error Host--if an error is detected on the channel used
 for host communication this interrupt is generated.
 
-4.5.2 Error Flag
+### Error Flag
 
 There is an internal Error flag that is tied to the Error pin that
 indicates that the processor is in an unknown, inconsistent or failure
@@ -1960,7 +1948,7 @@ run successfully it can be cleared by software (EROF). It is also set by
 consecutive unserviced Uncorrectable ECC errors. The Error flag and pin
 can also be set and reset by the ERON and EROF instructions respectively.
 
-4.6 Communication
+## Communication
 
 There are 22 unidirectional direct memory access (DMA) I/O channels
 on each processor, 11 for input and 11 for output. The Input ports are
@@ -2065,7 +2053,7 @@ the message is sent the input channel will simply hang. This condition
 can be avoided by correct software or by setting up timeout conditions
 using the Timeout Register.
 
-4.7 Instruction Formats and Addressing Modes
+## Instruction Formats and Addressing Modes
 
 The processor is designed to be as simple and symmetric as possible. Most
 instructions work on all supported data types; the General registers
@@ -2103,7 +2091,7 @@ the operation performed is
 The order of address evaluation is from the low address so that the
 address for A is evaluated before the address for B.
 
-4.7.1 Opcode Formats
+### Opcode Formats
 
 All opcodes are one byte long and each operation type group has at least
 one reserved code for future expansion. The byte is divided into two
@@ -2183,14 +2171,15 @@ Reserved for Tempreal     *,*                    12
 Reserved (Arbitrary)      *,*                    13
 ```
 
-4.7.2 Addressing Modes
+### Addressing Modes
 
 If an instruction has operands, the address fields always have at
 least one byte. The first byte, called the Mode Specifier, encodes the
 addressing mode and for most of the instructions the first four bits
 specify the general register to be used in the address evaluation while
 the next four bits indicate the mode. The format is as shown below:
-##STR19##
+
+TODO: figure
 
 The modes are listed below with their encodings and mnenomics.
 
@@ -2444,9 +2433,9 @@ back on the stack. In the case of Divide and Subtract the operand at the
 top of the stack is the dividend and subtrahend respectively. If both
 specifiers are SP for a Move instruction, only the flags are affected.
 
-4.8 Instruction Set
+## Instruction Set
 
-4.8.1 Instruction Set Details
+### Instruction Set Details
 
 The instructions are listed alphabetically (by mnemonic) and are
 grouped according to operation (e.g. all the Ad instructions are grouped
@@ -2501,7 +2490,7 @@ It is important to remember that the Negative (N) Flag is always set
 according to the sign of the correct result. Thus on integer overflow,
 the destination may appear positive even when N indicates negative.
 
-4.8.2 Instruction Definitions
+### Instruction Definitions
 
 ```
 ADC - ADD WITH CARRY
@@ -3071,35 +3060,48 @@ Exceptions:
    none
 ```
 
-4.9 Processor Initialization
-A processor can be initialized by either asserting the reset pin or by executing a RSET instruction. The resulting initialization is significantly different in the two cases. They are both described below.
+## Processor Initialization
+A processor can be initialized by either asserting the reset pin
+or by executing a RSET instruction. The resulting initialization is
+significantly different in the two cases. They are both described below.
 
-4.9.1 Hardware Initialization
-Hardware initialization is done by asserting the reset pin and proceeds in several steps:
+### Hardware Initialization
+Hardware initialization is done by asserting the reset pin and proceeds
+in several steps:
 
 0) External requests are ignored.
 
-1) The ERROR/ pin is latched into bit 31 (the mode flag) of the ID processor register which indicates whether it is an I/O processor (0) or an array processor (1). If the ERROR/ pin is grounded, bit 31 is set to 1 indicating that the processor is on an I/O board. A floating ERROR/ pin will cause bit 31 to become 0 which implies that the processor is on an array board. The mode flag is latched when the reset goes away.
+1) The ERROR/ pin is latched into bit 31 (the mode flag) of the ID
+processor register which indicates whether it is an I/O processor (0)
+or an array processor (1). If the ERROR/ pin is grounded, bit 31 is set
+to 1 indicating that the processor is on an I/O board. A floating ERROR/
+pin will cause bit 31 to become 0 which implies that the processor is
+on an array board. The mode flag is latched when the reset goes away.
 
-2) The processor performs self tests on the various internal units and sets memory locations 4 to 2048 to zero. Location 0 is set to 1 (Word) if the processor passed its tests and -1 if it failed.
+2) The processor performs self tests on the various internal units and
+sets memory locations 4 to 2048 to zero. Location 0 is set to 1 (Word)
+if the processor passed its tests and -1 if it failed.
 
 3) The processor state is set to zero except for
 
 a) bit 31 in the ID register (see above)
 
-b) bits 24-31 of the Configuration register are set by the manufacturing process
+b) bits 24-31 of the Configuration register are set by the manufacturing
+process
 
 c) the stack pointer (SP) and the fault register (FR) which are undefined
 
 d) input and output ready bits are set to 1 and interrupts are disabled.
 
-4) The "shadow" ROM on the processor is activated and the procedure listed below is executed. Its function is to
+4) The "shadow" ROM on the processor is activated and the procedure
+listed below is executed. Its function is to
 
 a) determine whether it is an I/O or array processor
 
 b) if it is an array processor then
 
-1) it waits to receive a value (halfword) which is the length of the actual message (see 3)
+1) it waits to receive a value (halfword) which is the length of the
+actual message (see 3)
 
 2) it replies with a status message indicating that it is ready to receive the full message
 
@@ -3184,8 +3186,22 @@ JMP 1024;
 
 ! End of shadow Rom code; ##STR41##
 
-5 THE SOFTWARE 5.1 Introduction
-There are two levels of operating software in the system: the Monitor (in EPROM) and the Operating System. The monitor is a simple, single user system that is in effect when the system is powered on. The Monitor uses terminal 0 and provides extensive diagnostic and management functions. The Operating System, IX™ (IX is a trademark of NCUBE Corporation), is automatically invoked if the system is in Normal mode and passes the diagnostic tests. IX™ is a fully protected multiuser, multitasking operating system with complete resource management including memory, main array, graphics and file system. The file system has a hierarchical structure and is distributed across all the disk drives in the system. Thus, a user can access his files regardless of which terminal (or Peripheral Controller) he uses.
+# THE SOFTWARE
+
+## Introduction
+
+There are two levels of operating software in the system: the Monitor
+(in EPROM) and the Operating System. The monitor is a simple, single user
+system that is in effect when the system is powered on. The Monitor
+uses terminal 0 and provides extensive diagnostic and management
+functions. The Operating System, IX™ (IX is a trademark of NCUBE
+Corporation), is automatically invoked if the system is in Normal mode
+and passes the diagnostic tests. IX™ is a fully protected multiuser,
+multitasking operating system with complete resource management including
+memory, main array, graphics and file system. The file system has a
+hierarchical structure and is distributed across all the disk drives in
+the system. Thus, a user can access his files regardless of which terminal
+(or Peripheral Controller) he uses.
 
 In may ways the Operating System is similar to UNIX™ (UNIX is a Bell Laboratories trademark), and therefore will not be described in detail herein. The IX™ System does, however, have additional facilities including:
 
@@ -3199,12 +3215,13 @@ In may ways the Operating System is similar to UNIX™ (UNIX is a Bell Laborator
 
 The IX System is described in section 5.3.
 
-5.2 The Monitor 5.2.1 Introduction
+## The Monitor
+### Introduction
 The Monitor is contained in the system EPROM and is invoked when the system is powered on. The Monitor always communicates with Terminal 0 on Peripheral Controller 0 (the System Console) for displaying messages and receiving commands. When the system mode switch on the front panel is in the "Normal" position, the Monitor runs the diagnostics and boots the Operating System (if the diagnostics run successfully). If the mode switch is set to "Diagnostic", the Monitor goes into a single user system after successfully running the diagnostics. The Monitor system provides a large range of offline diagnostic and backup facilities.
 
 The Monitor consists of two parts: the ROM Monitor and the RAM Monitor. They are both in the system EPROM but the ROM Monitor uses no RAM even for stack space while the RAM Monitor, when invoked, is copied to RAM and uses RAM for data. The ROM Monitor starts the system and executes the diagnostics up to the memory test phase. If memory test passes, the RAM Monitor is automatically invoked; but if it fails, the system stays in the ROM Monitor and a few simple commands are available (see 5.2.3).
 
-5.2.2 Monitor Diagnostics
+### Monitor Diagnostics
 The facilities tested by the Monitor diagnostics are listed below in order.
 
 1) The two front panel LEDs are turned on and the ROM Monitor is started
@@ -3257,7 +3274,7 @@ Otherwise
 
 20) The system stays int eh RAM Monitor, a ">" prompt is displayed and the system waits for a command.
 
-5.2.3 ROM Monitor Commands
+### ROM Monitor Commands
 Since the ROM Monitor does not use RAM, its commands are few and simple. They are listed below and are invoked by typing the first letter in the command name. A "return" causes a new "$" prompt to be displayed. A " t" can be typed at any time and whatever is happening will be aborted and a new prompt displayed. The operand specifications for the commands are defined as follows
 
 ADDR consists of two 4 digit hexadecimal numbers separated by a colon. The first number is the segment selector and the second is the offset. ##STR42##
@@ -3301,26 +3318,41 @@ set <ADDR>
 
 The value in memory at ADDR is displayed and can be altered by typing a new value. A "line feed" advances to the next word in memory and repeats the command. A "return" terminates it.
 
-5.2.4 RAM Monitor Commands
+### RAM Monitor Commands
 The RAM Monitor is invoked automatically if the diagnostics pass the memory test or explicitly by typing "g" in response to the ROM Monitor prompt. The RAM Monitor Commands are of four types: general, debugging, disk control or tape control. The general commands are invoked by typing the first letter of the command name. The debugging, disk control and tape control command are invoked by first typing "y", "x" or "t" respectively, followed by the first letter of the specific command name. If "return" is the first character typed, a new monitor prompt, ">", is printed and the command analyzer is restarted. A " c" can be typed at any time and regardless of what is happening, it will be aborted and a new prompt will be displayed.
 
 The operand specifications are the same as the ROM Monitor's (see 5.2.3) but with several additions.
 
-5.3 The Operating System 3.3.1 Overview
+## The Operating System
+### Overview
 The operating system, IX™, is a high performance UNIX-style interface to the hardware. It supports multiple users, including password and billing, and multitasking. The editor, NMACS, is screen oriented and is similar to a simplified version of EMACS. The file system is the most prominent feature of the operating software because nearly every system resource is treated as a type of file. The file system is hierarchical like UNIX but has extensive mechanisms for file protection and sharing. The operating system treats memory as a collection of segments that can be allocated and shared. Processes are created and scheduled (priority, round robin) by the system and provide part of the protection facility. There is a debugger and a linking loader. One of the unique facilities of the IX™ system is the management of the main processing array. It is managed as a device and each process requests subsets of the array which are allocated according to availability. Fault tolerance is supported by the system it periodically runs diagnostics on the array and if any nodes fail, they are mapped out of the allocatable resource and the operator is informed of the fault. Only the facilities listed above which are essential to an understanding of the present invention are described in more detail below.
 
-5.3.2 File System
-The file system is the user's uniform interface to almost all of the system resources. The two main entities in the file system are directories which provide the structure and files which contain the data. Most resources (e.g. printers, terminals, processing array) are treated as devices which are simply one type of file. A file has a name which both uniquely identifies it and indicates its position in the file structure. Files have a set of operations defined that can be performed by a user having the requisite privileges.
+### File System
+The file system is the user's uniform interface to almost all of
+the system resources. The two main entities in the file system are
+directories which provide the structure and files which contain the
+data. Most resources (e.g. printers, terminals, processing array) are
+treated as devices which are simply one type of file. A file has a name
+which both uniquely identifies it and indicates its position in the file
+structure. Files have a set of operations defined that can be performed
+by a user having the requisite privileges.
 
-5.3.3 Editing
-There are three editors in the IX™ system. One is a line editor called "ed". It is compatible with the "ed" line editor in UNIX. Another is a stream editor whose name is "sed". Sed is also compatible with the UNIX stream editor of the same name. For detailed information see the extensive literature on standard UNIX systems (e.g. B. W. Kernighan's books: "A Tutorial Introduction to the ED Text Editor" and "Advanced editing on UNIX").
+### Editing
+There are three editors in the IX™ system. One is a line editor called
+"ed". It is compatible with the "ed" line editor in UNIX. Another is
+a stream editor whose name is "sed". Sed is also compatible with the
+UNIX stream editor of the same name. For detailed information see the
+extensive literature on standard UNIX systems (e.g. B. W. Kernighan's
+books: "A Tutorial Introduction to the ED Text Editor" and "Advanced
+editing on UNIX").
 
-The third editor is a screen editor called "nm" (NMACS). It is similar to the widely used screen editor EMACS.
+The third editor is a screen editor called "nm" (NMACS). It is similar
+to the widely used screen editor EMACS.
 
-5.3.4 Memory Management
+### Memory Management
 The system of the present invention provides a segmented virtual memory environment. The virtual address space is 230 bytes. Main memory is treated as a set of segments on 256 byte boundaries. The operating system provides allocation, deallocation, extension (segments can grow to 64 Kbytes), compaction and swapping functions. The system relies on the Intel 80286 memory management hardware. Memory is allocated and deallocated with the system call "core".
 
-5.3.5 Process Management
+### Process Management
 Processes are managed by the operating system as the fundamental units of computation. They are created, scheduled, dispatched and killed by the system in a uniform way for all processes. When the operating system is booted the primary, highest priority system process, called the MCP (Master Control Program), is dispatched. It initializes the system including dispatching background system processes (like a print spooler) that it gets from a system initialization file, watches terminals and creates processes. It also cleans up and shuts down the system when power failure or overheating is detected.
 
 Whenever a user logs on the system, the MCP checks his name and password. If he is an authorized user and the password is correct, the MCP creates a process for him. The parameters of the process are taken from his "log on" file that is created by the system administrator. These parameters include the priority, the initial program (usually the shell), the preface (user's root directory) and billing information. The logon file for "user1" is named /sys/acct/user1.
@@ -3408,19 +3440,19 @@ psend: send a message or signal
 
 vector: set interrupt vector
 
-5.3.6 Device Management
+### Device Management
 The system treats almost all resources as devices which are simply a special type of file. The devices include disk drives, tape drives, printers, graphics hardware, interboard bus, SBX interfaces and the hypercube array. Devices are managed as are other files with open, close, read and write calls. For special operations that do not fall easily in those categories, the operating system supports a "special operation" call. These special operations are things such as setting terminal parameters and printer fonts.
 
-5.3.6.1 Hypercube Array
+#### Hypercube Array
 The system treats the hypercube array as a device type file. Consequently, it is allocated with an "open" command, deallocated with "close" and messages are sent and received with "write" and "read" respectively. One of the powerful features of the hypercube is that it is defined recursively and so all orders of cube are logically equivalent. When allocation is requested the user specifies in the "open" call the subcode order (N) he needs. If a subcode of that order is available, it is initialized and the nodes are numbered from 0 to 2N-1. The subcube is allocated as close as possible to the Peripheral Controller that the user's terminal is connected to. If no subcube of that size is available, the "open" returns an error condition. This allows the user to either wait for a subcube of order N to become available or to request a smaller one. Once allocated the user owns the subcude until his process terminates or he explicitly deallocates (closes) it. A degree of fault tolerance is achieved in the system because the operating system periodically runs diagnostics on the Hypercube Array and if a node fails, it is mapped out of the allocatable resource. However, the rest of the nodes are available for use. (A faulted node also causes the LED attached to its Array board to be turned off indicating a condition requiring service.)
 
-5.3.6.2 Graphics System
+#### Graphics System
 The graphics boards are also treated as device files and are allocated and managed by each user with file system calls. The special operations that are defined for the graphics devices are the graphics operations that the hardware itself supports such as line and circle drawing, fill-in, panning, etc.
 
-5.3.6.3 SBX Interface
+#### SBX Interface
 Each System Control board in a system has three SBX connectors. One is used for the cartridge tape controller and another is dedicated to providing the Interboard Bus (a bus for moving data between Peripheral Controllers). The last SBX connector is available for custom parallel I/O applications. There are many potential uses for the SBX Interface including networking, 9 track tape drive controller, etc. Regardless of whit it is used for, it will be treated as a device by the operating system. Consequently, it is only necessary to write the appropriate device driver in order to use the standard file system calls for device management.
 
-5.3.7 Initialization
+### Initialization
 The first level initialization is accomplished by simply turning on the system in Normal mode. When the operating system is booted, it looks for a configuration file called
 
 /sys/startup
@@ -3439,8 +3471,11 @@ ______________________________________MOVW       ID,R1     ;ID is memory locatio
 5.3.8 Operating System Commands
 This section specifies the commands in alphabetic order that are implemented in the operating system:
 
-______________________________________ADB:           debuggerAS:            assembler (80286)ASN:           assembler ( )AT:            later executionCAT:           catenate and printCD:            change directoryCHMOD:         change protectionCMP:           file compareCN:            change nameCP:            copyDATE:          print dateDC:            desk calculatorDF:            disk free spaceDIFF:          diff. file compareDU:            disk usageECHO:          echo argumentsED:            line editorET:            terminal emulationF77:           Fortran 77 (80286)F77N:          Fortran 77 ( )GREP:          pattern searchHELP:          helpHD:            hex dumpKILL:          kill processLN:            make a linkLS:            list directoryMAIL:          local mailMAN:           print manualMESG:          messages (yes/no)MORE:          paged displayMOUNT:         mount file systemNM:            screen editor (NMACS)NSH:           shell (see SH)PASSWD:        change passwordPR:            print filePS:            process statusPSTAT:         system statusPWD:           working directoryRM:            remove fileRMLN:          remove linkROFF:          text formatterSA:            system accountingSED:           stream editorSH:            shellSHUT:          invoke RAM MonitorSLEEP:         suspend processSORT:          sort or mergeSPLIT:         split a fileSTTY:          set terminalTEE:           pipe with file saveWAIT:          wait for completionWALL:          write to all usersWHO:           display system usersWRITE:         send text______________________________________
-5.3.9 File Formats and Conventions
+```
+ADB:           debuggerAS:            assembler (80286)ASN:           assembler ( )AT:            later executionCAT:           catenate and printCD:            change directoryCHMOD:         change protectionCMP:           file compareCN:            change nameCP:            copyDATE:          print dateDC:            desk calculatorDF:            disk free spaceDIFF:          diff. file compareDU:            disk usageECHO:          echo argumentsED:            line editorET:            terminal emulationF77:           Fortran 77 (80286)F77N:          Fortran 77 ( )GREP:          pattern searchHELP:          helpHD:            hex dumpKILL:          kill processLN:            make a linkLS:            list directoryMAIL:          local mailMAN:           print manualMESG:          messages (yes/no)MORE:          paged displayMOUNT:         mount file systemNM:            screen editor (NMACS)NSH:           shell (see SH)PASSWD:        change passwordPR:            print filePS:            process statusPSTAT:         system statusPWD:           working directoryRM:            remove fileRMLN:          remove linkROFF:          text formatterSA:            system accountingSED:           stream editorSH:            shellSHUT:          invoke RAM MonitorSLEEP:         suspend processSORT:          sort or mergeSPLIT:         split a fileSTTY:          set terminalTEE:           pipe with file saveWAIT:          wait for completionWALL:          write to all usersWHO:           display system usersWRITE:         send text
+```
+
+### File Formats and Conventions
 In this section the data structures that are used in the operating system are specified. Most of the structures are used for managing ##STR45##
 
 To fully understand some of these structures it is necessary to have a working knowledge of the 80286 (see iAPX 286 Programmer's Reference Manual from Intel for details). Some of the important characteristics of the 80286 are:
@@ -3458,7 +3493,10 @@ In the specifications below the abbreviations have the following meanings: C=Con
 DESCRIPTION
 The file system maintains a cache of buffers for disk sectors to minimize the actual disk traffic. The number of buffers is set by the system variable "caccnt". When the buffers are all full and a sector must be read that is not in a buffer, the least recently used buffer is used for the new sector. Therefore, the buffers are arranged in a linked list with a system variable "lruptr" pointing to the least recently used buffer. The entries in the sector buffer cache table (which is located at "cactab") are called sector buffer descriptors ("sucbufdes") and are specified below.
 
-______________________________________secbufdes -- format of a sector buffer descriptorH       caclruf  ;least recently used link forwardH       caclrup  ;least recently used link backwardB       cacst    ;buffer status (see below)/access countB       cacmod   ;buffer modifiedH       cacchn   ;lock chain for bufferH       cacchne  ;H       cacdev   ;device number (*2) for bufferW       cacadr   ;disk address of bufferbufstC       unchanged = 0               ;buffer not saved on swap ????C       modified = 1               ;buffer modified (saved on swap)SEE ALSOsysdata(5)DIR(5)                      DIR(5)NAMEdir -- format of a directory______________________________________
+```
+secbufdes -- format of a sector buffer descriptorH       caclruf  ;least recently used link forwardH       caclrup  ;least recently used link backwardB       cacst    ;buffer status (see below)/access countB       cacmod   ;buffer modifiedH       cacchn   ;lock chain for bufferH       cacchne  ;H       cacdev   ;device number (*2) for bufferW       cacadr   ;disk address of bufferbufstC       unchanged = 0               ;buffer not saved on swap ????C       modified = 1               ;buffer modified (saved on swap)SEE ALSOsysdata(5)DIR(5)                      DIR(5)NAMEdir -- format of a directory
+```
+
 DESCRIPTION
 Each node in the file system hierarchy is a directory. A directory contains pointers to files or other directories. The first name in every directory is "." and refers to itself. Names of files and directories can have at most 24 characters from the set (a-z,0-9,$,--,.). A directory is made of one or more directory sectors ("dirsec"). A directory sector contains up to 32 entries, each of which is 32 bytes. The first entry contains defining information about the directory. The rest of the entries, called directory pointers ("dirptr"), are pointers to files or other directories. The structure of directory sectors and directory pointers are specified below.
 
