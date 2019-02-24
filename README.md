@@ -1,3 +1,5 @@
+![Patent cover image](images/patent.png)
+
 # High performance computer system
 
 # Abstract
@@ -161,51 +163,68 @@ will be apparent from the following detailed description of a preferred
 embodiment of the invention, as illustrated in the accompanying drawings
 wherein:
 
+![Fig 1](images/fig-1.png)
 FIG. 1 is a block diagram of a multiprocessing system in which the
 present invention is embodied;
 
+![Fig 1](images/fig-2a.png)
 FIG. 2a is a detailed diagram of the arrangement of the serial
 communications interconnect on the backplane of the multiprocessing
 system shown in FIG. 1;
 
+![Fig 1](images/fig-2b.png)
 FIG. 2b is a detailed diagram of the signal control interconnect on the
 backplane of the multiprocessing system shown in FIG. 1;
 
+![Fig 1](images/fig-3.png)
 FIG. 3 is a detailed diagram of the arrangement of processing nodes and
 serial communications interconnect on the processor array board shown
 in FIG. 1;
 
+![Fig 1](images/fig-4.png)
 FIG. 4 is a detailed block diagram of a single processing node on the
 processor array board of FIG. 3;
 
+![Fig 1](images/fig-5.png)
 FIG. 5 is a detailed block diagram of the Ncub™ processor integrated
 circuit shown in FIG. 4;
 
+![Fig 1](images/fig-6.png)
 FIG. 6 is a detailed block diagram of the floating point unit shown in
 FIG. 5;
 
+![Fig 1](images/fig-7.png)
 FIG. 7 is a detailed block diagram of the address unit and instruction
 cache shown in FIG. 5;
 
+![Fig 1](images/fig-8.png)
 FIG. 8 is a detailed block diagram of the instruction decoder shown in
 FIG. 5;
 
+![Fig 1](images/fig-9a.png)
+![Fig 1](images/fig-9b.png)
 FIGS. 9a and 9b together is a detailed block diagram of the integer
 execution unit shown in FIG. 5;
 
+![Fig 1](images/fig-10a.png)
+![Fig 1](images/fig-10b.png)
 FIGS. 10a and 10b together is a detailed block diagram of the one of
 the eleven serial I/O ports shown in FIG. 5;
 
+![Fig 1](images/fig-11.png)
 FIG. 11 is a detailed block diagram of the memory interface logic shown
 in FIG. 5;
 
+![Fig 1](images/fig-12.png)
 FIG. 12 is a detailed block diagram of the system control board shown
 in FIG. 1;
 
+![Fig 1](images/fig-13.png)
 FIG. 13 is a detailed block diagram of the dual-ported processing nodes
 and serial communications interconnect on the system control board array
 interface shown in FIG. 12; and,
 
+![Fig 1](images/fig-14.png)
 FIG. 14 is a detailed block diagram of a single dual ported-processing
 node of the system control board interface shown in FIG. 13.
 
@@ -810,7 +829,7 @@ control. The controls include power supply monitoring and sequencing,
 error sensing and signaling, and board resets. All of the addresses and
 controls are described below:
 
-*  Array Reset
+#####  Array Reset
 ```
 I/O Address: 10
 Read and Write (Write causes reset)
@@ -818,16 +837,19 @@ Read and Write (Write causes reset)
     bit k: Resets Board k in Connector Jn, n = 20 - k
 ```
 
-*  Control
+#####  Control
 ```
 I/O Address: 12
 Read and Write
-  bit 0       0 =    Enable system memory error              correction
-  bit 1:      0 =    System memory check bit write              enable
+  bit 0       0 =    Enable system memory error correction
+  bit 1:      0 =    System memory check bit write enable
   bit 2:      1 =    Front panel light indicator # 1
   bit 3:      1 =    Front panel light indicator # 2
-  bit 4:      0 =    Reset reserved memory error              (attempt to access locations between              PROM and RAM)--bit must be 1 and              NMI enabled to latch error
-  bit 5:      0 =    Reset front panel interrupt--bit must              be 1 and NMI enabled to latch error
+  bit 4:      0 =    Reset reserved memory error (attempt to access
+                     locations between PROM and RAM)--bit must be 1 and
+                     NMI enabled to latch error
+  bit 5:      0 =    Reset front panel interrupt--bit must be 1 and
+                     NMI enabled to latch error
   bit 6:      1 =    Enable Nonmaskable Interrupt (NMI)
   bit 7:      1 =    Turn off +5 power supplies
   bit 8:      1 =    Turn on +24 power supply
@@ -840,7 +862,7 @@ Read and Write
   bit 15:     0 =    Fans on (1 = Fans off)
 ```
 
-*  Reset/Status
+#####  Reset/Status
 ```
 I/O Address: 16
 Write--Reset
@@ -865,7 +887,7 @@ Read--Status
   bit 15:     0 =    Power fail interrupt
 ```
 
-* Disk Disable/System ID
+##### Disk Disable/System ID
 ```
 I/O Address: 18
 Write--Disable
@@ -875,7 +897,7 @@ Read--System ID
   bits 3 to 15:  Low order part of system ID
 ```
 
-* Disk Enable/System ID
+##### Disk Enable/System ID
 ```
 I/O Address: 1A
 Write--Enable
@@ -884,7 +906,7 @@ Read--System ID
   bits 0 to 7:   High order part of system ID
 ```
 
-* Reset/ECC
+##### Reset/ECC
 ```
 I/O Address: 1C
 Write--Reset
@@ -939,7 +961,7 @@ Interrupt #86 (vector at memory address 158)
 The System Control board has a real time clock (84) that is controlled
 and sensed by writing and reading the following I/O addresses.
 
-* Control/Status
+##### Control/Status
 ```
 I/O Address: 40
 Write--Control
@@ -957,7 +979,7 @@ Read--Status
   bits 4 to 15: Reserved
 ```
 
-* Set/Interrupt
+##### Set/Interrupt
 ```
 I/O Address: 5E
 Read and Write
@@ -985,7 +1007,7 @@ No Interrupt       000
 60.0 Seconds       111
 ```
 
-* Time Set/Read
+##### Time Set/Read
 ```
 Write (Set) and Read (Sense)
 I/O Address  Function
@@ -1677,7 +1699,7 @@ for the instruction following one of the REPEAT operation codes.)
 time the instruction the following repeat-type operation code is executed
 the value in REG is decremented; REG can be any of the General registers.)
 
-##### Fault Register (P2, FR)
+#### Fault Register (P2, FR)
 When the processor takes an interrupt generated by an exception this
 register contains information to aid recovery. The format of the Fault
 Register is shown below.
