@@ -2511,92 +2511,123 @@ the destination may appear positive even when N indicates negative.
 
 ### 4.8.2 Instruction Definitions
 
-```
-ADC - ADD WITH CARRY
+#### ADC - ADD WITH CARRY
 Opcodes:
+```
   50     ADCB       ADd with Carry Byte
   52     ADCH       ADd with Carry Halfword
   54     ADCW       ADd with Carry Word
+```
 Assembler Syntax:
+```
   ADC{B,H,W} src,des
+```
 Operation:
+```
   src + dsrc + Carry → des
+  src + dsrc + Carry → des
+```
 Flags:
-  C ← carry from most significant bit
-  N ← des < 0
-  Z ← des = 0
-  V ← Integer overflow
-  U ← 0
+  * `C` ← carry from most significant bit
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
+  * `U` ← 0
 Description:
-  The Carry and source values are added to the destination and the result replaces the   destination.
+  The Carry and source values are added to the destination and the result
+  replaces the destination.
+
 Exceptions:
-  Integer overflow
-```
+  * Integer overflow
 
-```
-ADCD - ADD WITH CARRY DECIMAL
+#### ADCD - ADD WITH CARRY DECIMAL
 Opcode:
+```
   81     ADCD       ADd with Carry Decimal
+```
 AssemblerSyntax:
+```
   ADCD src,des
+```
 Operation:
+```
   src + dsrc + Carry → des
+```
 Flags:
-  C ← Carry out of high order digit
-  N ← 0
-  Z ← des = 0
-  V ← 0
-  U ← 0
+  * `C` ← Carry out of high order digit
+  * `N` ← 0
+  * `Z` ← des = 0
+  * `V` ← 0
+  * `U` ← 0
 Description:
-  The Carry and source value (treated as a two decimal value) are added to the destination (also   considered as a two decimal value) and the   result replaces the destination. No check for   invalid BCD encoding is made.
-Exceptions:   none
-```
+  The Carry and source value (treated as a two decimal value) are added
+  to the destination (also considered as a two decimal value) and the
+  result replaces the destination. No check for invalid BCD encoding
+  is made.
 
-```
-ADD - ADD
+Exceptions:
+  * none
+
+#### ADD - ADD
 Opcodes:
+```
   40     ADDB       ADD Byte
   42     ADDH       ADD Halfword
   44     ADDW       ADD Word
   48     ADDR       ADD Real
   4A     ADDL       ADD Longreal
+```
 AssemblerSyntax:
+```
   ADD{B,H,W,R,L} src,des
+```
 Operation:
+```
   src + dsrc → des
-Flags:  (Integer Operations: ADDB,ADDH,ADDW)
-  C ← carry from most significant bit
-  N ← des < 0
-  Z ← des = 0
-  V ← Integer overflow
-  U ← 0
-Flags:  (Floating Point Operations: ADDR,ADDL)
-  C ← des < 0
-  N ← des < 0
-  Z ← des = 0
-  V ← 0
-  U ← 0
-  IX ← des rounded
-  UF ← des underflowed
-  FZ ← 0
-  OF ← des overflowed
-  IN ← dsrc or src = Nan
+```
+Flags:  (Integer Operations: `ADDB,ADDH,ADDW`)
+  * `C` ← carry from most significant bit
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
+  * `U` ← 0
+Flags:  (Floating Point Operations: `ADDR,ADDL`)
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
+  * `U` ← 0
+  * `IX` ← des rounded
+  * `UF` ← des underflowed
+  * `FZ` ← 0
+  * `OF` ← des overflowed
+  * `IN` ← dsrc or src = Nan
 Description:
-  The source is added to the destination and theresult is stored at the address of the destination.
-Exceptions:
-   Integer overflow, Inexact, Underflow, Overflow,   Invalid
-```
+  The source is added to the destination and theresult is stored at the
+  address of the destination.
 
-```
-AND - AND
+Exceptions:
+  * Integer overflow
+  * Inexact
+  * Underflow
+  * Overflow
+  * Invalid
+
+#### AND - AND
 Opcodes:
+```
   41     ANDB       AND Byte
   43     ANDH       AND Halfword
   45     ANDW       AND Word
+```
 AssemblerSyntax:
+```
   AND{B,H,W} src,des -
+```
 Operation:
+```
   src AND dsrc → des
+```
 Flags:
   C ← C
   N ← des < 0
@@ -2607,7 +2638,6 @@ Description:
   The destination operand is anded with the sourceand the result is stored at the destination address.
 Exceptions:
    none
-```
 
 ```
 B - Branch
