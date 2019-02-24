@@ -1,4 +1,4 @@
-![Patent cover image](images/patent.png | width=320)
+![Patent cover image](images/patent.png?s=320)
 
 # High performance computer system
 
