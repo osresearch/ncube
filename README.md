@@ -1,4 +1,4 @@
-![Patent cover image](images/patent.png)
+![Patent cover image](images/patent.png | width=320)
 
 # High performance computer system
 
@@ -163,68 +163,68 @@ will be apparent from the following detailed description of a preferred
 embodiment of the invention, as illustrated in the accompanying drawings
 wherein:
 
-![Fig 1](images/fig-1.png)
+![Fig 1](images/fig-1.png | width=640)
 FIG. 1 is a block diagram of a multiprocessing system in which the
 present invention is embodied;
 
-![Fig 1](images/fig-2a.png)
+![Fig 1](images/fig-2a.png | width=640)
 FIG. 2a is a detailed diagram of the arrangement of the serial
 communications interconnect on the backplane of the multiprocessing
 system shown in FIG. 1;
 
-![Fig 1](images/fig-2b.png)
+![Fig 1](images/fig-2b.png | width=640)
 FIG. 2b is a detailed diagram of the signal control interconnect on the
 backplane of the multiprocessing system shown in FIG. 1;
 
-![Fig 1](images/fig-3.png)
+![Fig 1](images/fig-3.png | width=640)
 FIG. 3 is a detailed diagram of the arrangement of processing nodes and
 serial communications interconnect on the processor array board shown
 in FIG. 1;
 
-![Fig 1](images/fig-4.png)
+![Fig 1](images/fig-4.png | width=640)
 FIG. 4 is a detailed block diagram of a single processing node on the
 processor array board of FIG. 3;
 
-![Fig 1](images/fig-5.png)
+![Fig 1](images/fig-5.png | width=640)
 FIG. 5 is a detailed block diagram of the Ncub™ processor integrated
 circuit shown in FIG. 4;
 
-![Fig 1](images/fig-6.png)
+![Fig 1](images/fig-6.png | width=320)
 FIG. 6 is a detailed block diagram of the floating point unit shown in
 FIG. 5;
 
-![Fig 1](images/fig-7.png)
+![Fig 1](images/fig-7.png | width=320)
 FIG. 7 is a detailed block diagram of the address unit and instruction
 cache shown in FIG. 5;
 
-![Fig 1](images/fig-8.png)
+![Fig 1](images/fig-8.png | width=320)
 FIG. 8 is a detailed block diagram of the instruction decoder shown in
 FIG. 5;
 
-![Fig 1](images/fig-9a.png)
-![Fig 1](images/fig-9b.png)
+![Fig 1](images/fig-9a.png | width=320)
+![Fig 1](images/fig-9b.png | width=320)
 FIGS. 9a and 9b together is a detailed block diagram of the integer
 execution unit shown in FIG. 5;
 
-![Fig 1](images/fig-10a.png)
-![Fig 1](images/fig-10b.png)
+![Fig 1](images/fig-10a.png | width=640)
+![Fig 1](images/fig-10b.png | width=640)
 FIGS. 10a and 10b together is a detailed block diagram of the one of
 the eleven serial I/O ports shown in FIG. 5;
 
-![Fig 1](images/fig-11.png)
+![Fig 1](images/fig-11.png | width=640)
 FIG. 11 is a detailed block diagram of the memory interface logic shown
 in FIG. 5;
 
-![Fig 1](images/fig-12.png)
+![Fig 1](images/fig-12.png | width=640)
 FIG. 12 is a detailed block diagram of the system control board shown
 in FIG. 1;
 
-![Fig 1](images/fig-13.png)
+![Fig 1](images/fig-13.png | width=640)
 FIG. 13 is a detailed block diagram of the dual-ported processing nodes
 and serial communications interconnect on the system control board array
 interface shown in FIG. 12; and,
 
-![Fig 1](images/fig-14.png)
+![Fig 1](images/fig-14.png | width=640)
 FIG. 14 is a detailed block diagram of a single dual ported-processing
 node of the system control board interface shown in FIG. 13.
 
