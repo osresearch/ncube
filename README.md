@@ -4206,122 +4206,167 @@ significantly different in the two cases. They are both described below.
 Hardware initialization is done by asserting the reset pin and proceeds
 in several steps:
 
-0) External requests are ignored.
+* External requests are ignored.
 
-1) The ERROR/ pin is latched into bit 31 (the mode flag) of the ID
+* The ERROR/ pin is latched into bit 31 (the mode flag) of the ID
 processor register which indicates whether it is an I/O processor (0)
 or an array processor (1). If the ERROR/ pin is grounded, bit 31 is set
 to 1 indicating that the processor is on an I/O board. A floating ERROR/
 pin will cause bit 31 to become 0 which implies that the processor is
 on an array board. The mode flag is latched when the reset goes away.
 
-2) The processor performs self tests on the various internal units and
+* The processor performs self tests on the various internal units and
 sets memory locations 4 to 2048 to zero. Location 0 is set to 1 (Word)
 if the processor passed its tests and -1 if it failed.
 
-3) The processor state is set to zero except for
+* The processor state is set to zero except for
 
-a) bit 31 in the ID register (see above)
+  *  bit 31 in the ID register (see above)
 
-b) bits 24-31 of the Configuration register are set by the manufacturing
+  *  bits 24-31 of the Configuration register are set by the manufacturing
 process
 
-c) the stack pointer (SP) and the fault register (FR) which are undefined
+  *  the stack pointer (SP) and the fault register (FR) which are undefined
 
-d) input and output ready bits are set to 1 and interrupts are disabled.
+  *  input and output ready bits are set to 1 and interrupts are disabled.
 
-4) The "shadow" ROM on the processor is activated and the procedure
+* The "shadow" ROM on the processor is activated and the procedure
 listed below is executed. Its function is to
 
-a) determine whether it is an I/O or array processor
+  *  determine whether it is an I/O or array processor
 
-b) if it is an array processor then
+  *  if it is an array processor then
 
-1) it waits to receive a value (halfword) which is the length of the
+    *  it waits to receive a value (halfword) which is the length of the
 actual message (see 3)
 
-2) it replies with a status message indicating that it is ready to receive the full message
+    *  it replies with a status message indicating that it is ready to receive the full message
 
-3) it receives the message (the full software initialization software), loads it starting at location 0 and jumps to location 1024
+    *  it receives the message (the full software initialization software), loads it starting at location 0 and jumps to location 1024
 
-c) if it is an I/O processor it waits until the central processor writes a nonzero value in location 0 and then jumps to location 1024 where the I/O initialization software would have been placed.
+  *  if it is an I/O processor it waits until the central processor writes a nonzero value in location 0 and then jumps to location 1024 where the I/O initialization software would have been placed.
 
-d) a JMP (jump) to the initialization software is executed (the jmp disables the shadow ROM until it is enabled by another reset signal). The functions performed by the initialization software should include a full set of diagnostics.
+  *  a JMP (jump) to the initialization software is executed (the jmp disables the shadow ROM until it is enabled by another reset signal). The functions performed by the initialization software should include a full set of diagnostics.
 
-4.9.2 Initialization Procedure (shadow ROM)
+### 4.9.2 Initialization Procedure (shadow ROM)
+
 The code in the on-chip shadow ROM is listed below with comments.
 
-! During shadow ROM execution all interrupts are disabled including interrupts that are not normally maskable;
-
+```
+! During shadow ROM execution all interrupts are disabled including
+! interrupts that are not normally maskable;
 RSET ;
 
-! The RAM chips need 8 refresh cycles to initialize themselves. The refresh rate starts at one refresh every 8 cycles since the Configuration register is set to zero on reset. We idle for the required 64 cycles by looping on RSET 10 times. Each loop takes 7 cycles (3 for the RSET and 4 for the REP);
+! The RAM chips need 8 refresh cycles to initialize themselves. The
+! refresh rate starts at one refresh every 8 cycles since the Configuration
+! register is set to zero on reset. We idle for the required 64 cycles by
+! looping on RSET 10 times. Each loop takes 7 cycles (3 for the RSET and
+! 4 for the REP);
 
 MOVW #11,R0;
-
 REP R0;
-
 RSET;
 
-! The refresh rate is lowered to every 40 cycles by writing a 4 in the Configuration register. This is conservatively high but the operating system can lower it further if the processor clock rate justifies it;
+! The refresh rate is lowered to every 40 cycles by writing a 4 in the
+! Configuration register. This is conservatively high but the operating
+! system can lower it further if the processor clock rate justifies it;
 
 LDPR #4,#CONFIG;
 
-! Memory is now initialized with correct ECC bits by writing zero to every location. Since the Configuration register is initialized to assume 16k×4 memories, only the first quarter of memory is initialized by writing 8191 words. If the operating system changes the Configuration to 64k×4, then it should initialize the last 3/4 of memory;
+! Memory is now initialized with correct ECC bits by writing zero to
+! every location. Since the Configuration register is initialized to
+! assume 16k×4 memories, only the first quarter of memory is initialized
+! by writing 8191 words. If the operating system changes the Configuration
+! to 64k×4, then it should initialize the last 3/4 of memory;
 
 MOVW #8191,R0;
-
 MOVW #O,R1;
-
 REP R0;
-
 MOVW #O,(R1)+
 
-! A self test belongs here. The result is encoded and stored in memory at location 4. A -1 means everything is fine;
+! A self test belongs here. The result is encoded and stored in memory
+! at location 4. A -1 means everything is fine;
 
 MOVH #-1,4;
 
-! Bit 31 of the ID Register is initialized when the reset pin is asserted with a one if the processor is an I/O processor or a zero is the processor is an array processor. I/O processors are initialized from memory while array processors are initialized by the serial ports;
+! Bit 31 of the ID Register is initialized when the reset pin is asserted
+! with a one if the processor is an I/O processor or a zero is the processor
+! is an array processor. I/O processors are initialized from memory while
+! array processors are initialized by the serial ports;
 
 STGPR #IDREG,R0;
-
 BL IOINIT;
 
-! Array processor initialization waits for a port to receive a message. The code below assumes that only one port will try to initialize the processor. If messages come in at two ports exactly at the same time, the code may not work; ##STR37##
+! Array processor initialization waits for a port to receive a
+! message. The code below assumes that only one port will try to initialize
+! the processor. If messages come in at two ports exactly at the same time,
+! the code may not work;
 
-! Initialize the port so DMA transfer of a two byte message to location 2 will occur;
+PROCINIT: STPR #INPEND, R0  ! Are any incoming messages pending?
+          BF PROCINIT       ! No, try again
+          FFOW R0, R1       ! Yes, R1 gets the port number
+
+! Initialize the port so DMA transfer of a two byte message to location
+! 2 will occur;
 
 LPTR #2,R1;
-
 LCNT #2,R1;
 
 ! Compute in R3 the corresponding output port for a reply;
 
 MOVW R1,R3;
-
 ADDW #R2,R3;
 
-! Wait for incoming message DMA to complete; ##STR38##
+! Wait for incoming message DMA to complete;
 
-! Start the output port DMA. The message will be the two byte self test status in location 4;
+INWAIT1: STPR #INRDY, R2   ! Store input ready flags in R2
+         BITW R2, R0       ! Test the appropriate flag
+         BE INWAIT1        ! Loop until port is ready
+
+! Start the output port DMA. The message will be the two byte self test
+! status in location 4;
 
 LPTR #4,R3;
-
 LCNT #2,R3;
 
-! Reinitialize the same input port to receive the contents of memory; ##STR39##
+! Reinitialize the same input port to receive the contents of memory;
 
-! Jump to a preset location (1024) to begin execution from memory. The JMP resets the "shadow ROM active" flag;
+         LPTR #8, R1      ! The message will start at location 8
+         LCNT 2, R1       ! for number of bytes indicate by the first message
+
+INWAIT2: STPR #INRDY, R2  ! Wait for input DMA to complete by
+         BITW R2, R0      ! testing the appropriate ready flag
+         BE INWAIT2       ! and looping back until ready (done)
+
+! Jump to a preset location (1024) to begin execution from memory. The
+! JMP resets the "shadow ROM active" flag;
 
 JMP 1024;
 
-! I/O processor initialization. Wait for memory location 0 or 1 to go nonzero. The external processor that loads the memory image must wait at least xxx cycles after the RESET signal has gone away; ##STR40##
+! I/O processor initialization. Wait for memory location 0 or 1 to go
+! nonzero. The external processor that loads the memory image must wait
+! at least xxx cycles after the RESET signal has gone away;
 
-! Jump to a preset location (1024) to begin execution from memory. The JMP resets the "shadow ROM active: flag;
+IOINIT: BITH #-1,0   ! Test halfword at location 0
+        BE IONIT     ! Loop back until it becomes non-zero
+
+! Jump to a preset location (1024) to begin execution from memory. The
+! JMP resets the "shadow ROM active: flag;
 
 JMP 1024;
 
-! End of shadow Rom code; ##STR41##
+! End of shadow Rom code;
+```
+
+```
+MEMORY                      ADDRESS
+0                           0
+Initial message length      2
+test results                4
+reserved                    6
+DMA (int? ? vector)         8
+etc
+```
 
 # 5. THE SOFTWARE
 
@@ -4342,38 +4387,58 @@ the system. Thus, a user can access his files regardless of which terminal
 
 In may ways the Operating System is similar to UNIX™ (UNIX is a Bell Laboratories trademark), and therefore will not be described in detail herein. The IX™ System does, however, have additional facilities including:
 
-1) system temperature sensing
-
-2) distributed file system
-
-3) array management
-
-4) uniform file protection
+* system temperature sensing
+* distributed file system
+* array management
+* uniform file protection
 
 The IX System is described in section 5.3.
 
 ## 5.2 The Monitor
-### 5.2.1 Introduction
-The Monitor is contained in the system EPROM and is invoked when the system is powered on. The Monitor always communicates with Terminal 0 on Peripheral Controller 0 (the System Console) for displaying messages and receiving commands. When the system mode switch on the front panel is in the "Normal" position, the Monitor runs the diagnostics and boots the Operating System (if the diagnostics run successfully). If the mode switch is set to "Diagnostic", the Monitor goes into a single user system after successfully running the diagnostics. The Monitor system provides a large range of offline diagnostic and backup facilities.
 
-The Monitor consists of two parts: the ROM Monitor and the RAM Monitor. They are both in the system EPROM but the ROM Monitor uses no RAM even for stack space while the RAM Monitor, when invoked, is copied to RAM and uses RAM for data. The ROM Monitor starts the system and executes the diagnostics up to the memory test phase. If memory test passes, the RAM Monitor is automatically invoked; but if it fails, the system stays in the ROM Monitor and a few simple commands are available (see 5.2.3).
+### 5.2.1 Introduction
+
+The Monitor is contained in the system EPROM and is invoked when the
+system is powered on. The Monitor always communicates with Terminal 0
+on Peripheral Controller 0 (the System Console) for displaying messages
+and receiving commands. When the system mode switch on the front panel
+is in the "Normal" position, the Monitor runs the diagnostics and boots
+the Operating System (if the diagnostics run successfully). If the mode
+switch is set to "Diagnostic", the Monitor goes into a single user system
+after successfully running the diagnostics. The Monitor system provides
+a large range of offline diagnostic and backup facilities.
+
+The Monitor consists of two parts: the ROM Monitor and the RAM
+Monitor. They are both in the system EPROM but the ROM Monitor uses no
+RAM even for stack space while the RAM Monitor, when invoked, is copied to
+RAM and uses RAM for data. The ROM Monitor starts the system and executes
+the diagnostics up to the memory test phase. If memory test passes, the
+RAM Monitor is automatically invoked; but if it fails, the system stays
+in the ROM Monitor and a few simple commands are available (see 5.2.3).
 
 ### 5.2.2 Monitor Diagnostics
+
 The facilities tested by the Monitor diagnostics are listed below in order.
 
 1) The two front panel LEDs are turned on and the ROM Monitor is started
-
 2) The EPROM contents are verified (a checksum is computed)
-
 3) All I/O devices except the disk controller are initialized.
-
 4) The Serial Channel for Terminal 0 is tested
 
-5) If (2) or (4) fail, the LEDs remain on and the system hangs indicating that Peripheral Controller board 0 is bad.
+5) If (2) or (4) fail, the LEDs remain on and the system hangs indicating
+that Peripheral Controller board 0 is bad.
 
-6) If (2) or (4) pass, then the LED labeled "STATUS 2" is turned off, appropriate characteristics are set for Terminal 0 (19200 baud rate, etc) and the system startup message, " Parallel Processor Peripheral Subsystem", is displayed.
+6) If (2) or (4) pass, then the LED labeled "STATUS 2" is turned off,
+appropriate characteristics are set for Terminal 0 (19200 baud rate,
+etc) and the system startup message, " Parallel Processor Peripheral
+Subsystem", is displayed.
 
-7) System memory (RAM) is tested and any errors (including corrected ECC errors) are displayed. If there are memory errors or the Diagnostic Mode is on, the system stays in the ROM Monitor, prints "ROM-Only Diagnostic Monitor" followed by a "$" prompt and waits for user commands. If there are no memory errors and the system is in Normal Mode, the RAM Monitor is invoked and the diagnostics proceed.
+7) System memory (RAM) is tested and any errors (including corrected ECC
+errors) are displayed. If there are memory errors or the Diagnostic Mode
+is on, the system stays in the ROM Monitor, prints "ROM-Only Diagnostic
+Monitor" followed by a "$" prompt and waits for user commands. If there
+are no memory errors and the system is in Normal Mode, the RAM Monitor
+is invoked and the diagnostics proceed.
 
 8) The Disk Controller is tested if any disks are connected.
 
@@ -4397,72 +4462,132 @@ The facilities tested by the Monitor diagnostics are listed below in order.
 
 18) The DMA controller is checked.
 
-19) Any SBX Modules connected to the system (as indicated by an EPROM table) are tested.
+19) Any SBX Modules connected to the system (as indicated by an EPROM
+table) are tested.
 
 If the system is in Normal Mode and a disk is connected then
 
 20) The disks are started and the controller is tested.
 
-21) The disks are checked and fixed if a system crash was the cause of the last shutdown.
+21) The disks are checked and fixed if a system crash was the cause of
+the last shutdown.
 
 22) The Operating System is booted.
 
 Otherwise
 
-20) The system stays int eh RAM Monitor, a ">" prompt is displayed and the system waits for a command.
+20) The system stays int eh RAM Monitor, a ">" prompt is displayed and
+the system waits for a command.
 
 ### 5.2.3 ROM Monitor Commands
-Since the ROM Monitor does not use RAM, its commands are few and simple. They are listed below and are invoked by typing the first letter in the command name. A "return" causes a new "$" prompt to be displayed. A " t" can be typed at any time and whatever is happening will be aborted and a new prompt displayed. The operand specifications for the commands are defined as follows
 
-ADDR consists of two 4 digit hexadecimal numbers separated by a colon. The first number is the segment selector and the second is the offset. ##STR42##
+Since the ROM Monitor does not use RAM, its commands are few and
+simple. They are listed below and are invoked by typing the first letter
+in the command name. A "return" causes a new "$" prompt to be displayed. A
+"t" can be typed at any time and whatever is happening will be aborted
+and a new prompt displayed. The operand specifications for the commands
+are defined as follows
 
-SEG MAX is the number of 64 Kbyte segments of memory to be tested (starting from memory address 0).
+ADDR consists of two 4 digit hexadecimal numbers separated by a
+colon. The first number is the segment selector and the second is the
+offset.
 
-COMMANDS
-continue
+```
+LENGTH  \
+IOADDR   } are 4 digit hexadecimal numbres
+VALUE   /
+```
+
+SEG MAX is the number of 64 Kbyte segments of memory to be tested
+(starting from memory address 0).
+
+#### COMMANDS
+
+##### `continue`
 
 Restarts the disk operating system after a "debug" stop.
 
-display <ADDR>,<LENGTH>
+##### `display <ADDR>,<LENGTH>`
 
-A section of memory from ADDR to ADDR+LENGTH-1 is displayed in the following format: ##STR43## where ADDR is the beginning address, "hhhh" represents a 16 bit word in hex and the ASCII equivalent of the 8 words is also displayed ("." represents unprintable characters).
+A section of memory from ADDR to ADDR+LENGTH-1 is displayed in the
+following format:
+```
+ADDR hhhh hhhh hhhh hhhh hhhh hhhh hhhh hhhh <asci>
+```
+where ADDR is the beginning address, "`hhhh`" represents a 16 bit
+word in hex and the ASCII equivalent of the 8 words is also displayed
+("." represents unprintable characters).
 
-goto ram monitor
+##### `goto ram monitor`
 
 The RAM Monitor is booted.
 
-help
+##### `help`
 
 The list of ROM Monitor commands and operands is displayed.
 
-input <IOADDR>
+##### `input <IOADDR>`
 
-The value at I/O address IOADDR is displayed. Typing a "line feed" repeats the command with the same operand and a "return" terminates it.
+The value at I/O address IOADDR is displayed. Typing a "line feed"
+repeats the command with the same operand and a "return" terminates it.
 
-memory test <SEG MAX>
+##### `memory test <SEG MAX>`
 
 SEG MAX 64 Kbyte segments of memory are tested starting at memory address 0.
 
-output <IOADDR>,<VALUE>
+##### `output <IOADDR>,<VALUE>`
 
 VALUE is written to I/O address IOADDR. A "line feed" repeats the command at the same address but allows a different VALUE to be typed and "return" terminates it.
 
-power down
+##### `power down`
 
 The system is powered down.
 
-set <ADDR>
+##### `set <ADDR>`
 
-The value in memory at ADDR is displayed and can be altered by typing a new value. A "line feed" advances to the next word in memory and repeats the command. A "return" terminates it.
+The value in memory at ADDR is displayed and can be altered by typing a
+new value. A "line feed" advances to the next word in memory and repeats
+the command. A "return" terminates it.
 
 ### 5.2.4 RAM Monitor Commands
-The RAM Monitor is invoked automatically if the diagnostics pass the memory test or explicitly by typing "g" in response to the ROM Monitor prompt. The RAM Monitor Commands are of four types: general, debugging, disk control or tape control. The general commands are invoked by typing the first letter of the command name. The debugging, disk control and tape control command are invoked by first typing "y", "x" or "t" respectively, followed by the first letter of the specific command name. If "return" is the first character typed, a new monitor prompt, ">", is printed and the command analyzer is restarted. A " c" can be typed at any time and regardless of what is happening, it will be aborted and a new prompt will be displayed.
 
-The operand specifications are the same as the ROM Monitor's (see 5.2.3) but with several additions.
+The RAM Monitor is invoked automatically if the diagnostics pass the
+memory test or explicitly by typing "`g`" in response to the ROM Monitor
+prompt. The RAM Monitor Commands are of four types: general, debugging,
+disk control or tape control. The general commands are invoked by typing
+the first letter of the command name. The debugging, disk control and tape
+control command are invoked by first typing "`y`", "`x`" or "`t`" respectively,
+followed by the first letter of the specific command name. If "return"
+is the first character typed, a new monitor prompt, "`>`", is printed and
+the command analyzer is restarted. A "`c`" can be typed at any time and
+regardless of what is happening, it will be aborted and a new prompt
+will be displayed.
+
+The operand specifications are the same as the ROM Monitor's (see 5.2.3)
+but with several additions.
 
 ## 5.3 The Operating System
+
 ### 5.3.1 Overview
-The operating system, IX™, is a high performance UNIX-style interface to the hardware. It supports multiple users, including password and billing, and multitasking. The editor, NMACS, is screen oriented and is similar to a simplified version of EMACS. The file system is the most prominent feature of the operating software because nearly every system resource is treated as a type of file. The file system is hierarchical like UNIX but has extensive mechanisms for file protection and sharing. The operating system treats memory as a collection of segments that can be allocated and shared. Processes are created and scheduled (priority, round robin) by the system and provide part of the protection facility. There is a debugger and a linking loader. One of the unique facilities of the IX™ system is the management of the main processing array. It is managed as a device and each process requests subsets of the array which are allocated according to availability. Fault tolerance is supported by the system it periodically runs diagnostics on the array and if any nodes fail, they are mapped out of the allocatable resource and the operator is informed of the fault. Only the facilities listed above which are essential to an understanding of the present invention are described in more detail below.
+
+The operating system, IX™, is a high performance UNIX-style interface to
+the hardware. It supports multiple users, including password and billing,
+and multitasking. The editor, NMACS, is screen oriented and is similar
+to a simplified version of EMACS. The file system is the most prominent
+feature of the operating software because nearly every system resource is
+treated as a type of file. The file system is hierarchical like UNIX but
+has extensive mechanisms for file protection and sharing. The operating
+system treats memory as a collection of segments that can be allocated
+and shared. Processes are created and scheduled (priority, round robin)
+by the system and provide part of the protection facility. There is a
+debugger and a linking loader. One of the unique facilities of the IX™
+system is the management of the main processing array. It is managed as a
+device and each process requests subsets of the array which are allocated
+according to availability. Fault tolerance is supported by the system it
+periodically runs diagnostics on the array and if any nodes fail, they
+are mapped out of the allocatable resource and the operator is informed
+of the fault. Only the facilities listed above which are essential to an
+understanding of the present invention are described in more detail below.
 
 ### 5.3.2 File System
 The file system is the user's uniform interface to almost all of
@@ -4487,151 +4612,329 @@ The third editor is a screen editor called "nm" (NMACS). It is similar
 to the widely used screen editor EMACS.
 
 ### 5.3.4 Memory Management
-The system of the present invention provides a segmented virtual memory environment. The virtual address space is 230 bytes. Main memory is treated as a set of segments on 256 byte boundaries. The operating system provides allocation, deallocation, extension (segments can grow to 64 Kbytes), compaction and swapping functions. The system relies on the Intel 80286 memory management hardware. Memory is allocated and deallocated with the system call "core".
+The system of the present invention provides a segmented virtual memory
+environment. The virtual address space is 230 bytes. Main memory is
+treated as a set of segments on 256 byte boundaries. The operating
+system provides allocation, deallocation, extension (segments can grow
+to 64 Kbytes), compaction and swapping functions. The system relies
+on the Intel 80286 memory management hardware. Memory is allocated and
+deallocated with the system call "core".
 
 ### 5.3.5 Process Management
-Processes are managed by the operating system as the fundamental units of computation. They are created, scheduled, dispatched and killed by the system in a uniform way for all processes. When the operating system is booted the primary, highest priority system process, called the MCP (Master Control Program), is dispatched. It initializes the system including dispatching background system processes (like a print spooler) that it gets from a system initialization file, watches terminals and creates processes. It also cleans up and shuts down the system when power failure or overheating is detected.
+Processes are managed by the operating system as the fundamental units of
+computation. They are created, scheduled, dispatched and killed by the
+system in a uniform way for all processes. When the operating system
+is booted the primary, highest priority system process, called the
+MCP (Master Control Program), is dispatched. It initializes the system
+including dispatching background system processes (like a print spooler)
+that it gets from a system initialization file, watches terminals and
+creates processes. It also cleans up and shuts down the system when
+power failure or overheating is detected.
 
-Whenever a user logs on the system, the MCP checks his name and password. If he is an authorized user and the password is correct, the MCP creates a process for him. The parameters of the process are taken from his "log on" file that is created by the system administrator. These parameters include the priority, the initial program (usually the shell), the preface (user's root directory) and billing information. The logon file for "user1" is named /sys/acct/user1.
+Whenever a user logs on the system, the MCP checks his name and
+password. If he is an authorized user and the password is correct, the
+MCP creates a process for him. The parameters of the process are taken
+from his "log on" file that is created by the system administrator. These
+parameters include the priority, the initial program (usually the shell),
+the preface (user's root directory) and billing information. The logon
+file for "`user1`" is named `/sys/acct/user1`.
 
-A process is represented by a data structure in memory. This structure, called a process object, has the following entries:
+A process is represented by a data structure in memory. This structure,
+called a process object, has the following entries:
 
-state: This is the area where register values including segment pointers are saved when the process is not executing.
+* state: This is the area where register values including segment pointers
+are saved when the process is not executing.
 
-condition: The conditions that a process can be in are
+* condition: The conditions that a process can be in are
+  * runnable
+  * waiting for memory allocation
+  * waiting for array allocation
+  * waiting for a message
+  * waiting for error handling
+  * etc
 
-runnable
+* code and data: These entries point to the code and data for the
+process program.
 
-waiting for memory allocation
+* preface: This is the name of the root directory of the process.
 
-waiting for array allocation
+* directory: This is the name of the current working directory
 
-waiting for a message
+* priority: A number between 1 and 255 indicating the relative priority
+of the process (255 is the highest priority).
 
-waiting for error handling
+* time: The maximum number of clock ticks this process can run before it
+must be rescheduled.
 
-etc
+* rights: A process can be granted (1) or denied (0) various rights
+according to the setting of the flags listed below
+  * create links
+  * delete links
+  * create processes
+  * kill processes
+  * superuser
 
-code and data: These entries point to the code and data for the process program.
+* owner: Name of the user who created the process.
 
-preface: This is the name of the root directory of the process.
+* open files: This is a table of descriptors for each or the open files of
+the process. When a process is created the first three entries (channel
+numbers 0,1 and 2) are initialized to the following:
+  * `0` standard input file
+  * `1` standard output file
+  * `2` standard error file
 
-directory: This is the name of the current working directory
+When a new process is created, its owner, priority and rights are
+either initialized by the logon file or are inherited from the creating
+process. The priority and rights can be reduced or restricted but not
+increased or expanded.
 
-priority: A number between 1 and 255 indicating the relative priority of the process (255 is the highest priority).
-
-time: The maximum number of clock ticks this process can run before it must be rescheduled.
-
-rights: A process can be granted (1) or denied (0) various rights according to the setting of the flags listed below
-
-create links
-
-delete links
-
-create processes
-
-kill processes
-
-superuser
-
-owner: Name of the user who created the process.
-
-open files: This is a table of descriptors for each or the open files of the process. When a process is created the first three entries (channel numbers 0,1 and 2) are initialized to the following:
-
-0: standard input file
-
-1: standard output file
-
-2: standard error file
-
-When a new process is created, its owner, priority and rights are either initialized by the logon file or are inherited from the creating process. The priority and rights can be reduced or restricted but not increased or expanded.
-
-All processes in the system are linked together in the process list. When it is time to dispatch a new process the list is searched starting from the process that was most recently running. The search finds and dispatches the highest priority process that is in runnable condition. If there is more than one the last one found is dispatched. The process runs until one of three events occurs:
+All processes in the system are linked together in the process list. When
+it is time to dispatch a new process the list is searched starting
+from the process that was most recently running. The search finds and
+dispatches the highest priority process that is in runnable condition. If
+there is more than one the last one found is dispatched. The process
+runs until one of three events occurs:
 
 1) the process time slice is exhausted
-
 2) the process must wait for some event such as a message or disk operation
-
 3) another higher priority process becomes runnable.
 
-Thus, the process management system implements preemptive, priority, round robin scheduling.
+Thus, the process management system implements preemptive, priority,
+round robin scheduling.
+
+Process System Calls
 
 There are a set of operations for process management. These system calls are:
 
-Process System Calls
-frun: run a file
-
-getpcs: get priority, rights, time, condition, owner, etc
-
-chprot: change protection or rights
-
-alarm: set process alarm clock
-
-endpcs: terminate a process
-
-endump: terminate and dump
-
-pause: suspend a process
-
-psend: send a message or signal
-
-vector: set interrupt vector
+* `frun`: run a file
+* `getpcs`: get priority, rights, time, condition, owner, etc
+* `chprot`: change protection or rights
+* `alarm`: set process alarm clock
+* `endpcs`: terminate a process
+* `endump`: terminate and dump
+* `pause`: suspend a process
+* `psend`: send a message or signal
+* `vector`: set interrupt vector
 
 ### 5.3.6 Device Management
-The system treats almost all resources as devices which are simply a special type of file. The devices include disk drives, tape drives, printers, graphics hardware, interboard bus, SBX interfaces and the hypercube array. Devices are managed as are other files with open, close, read and write calls. For special operations that do not fall easily in those categories, the operating system supports a "special operation" call. These special operations are things such as setting terminal parameters and printer fonts.
+The system treats almost all resources as devices which are simply a
+special type of file. The devices include disk drives, tape drives,
+printers, graphics hardware, interboard bus, SBX interfaces and the
+hypercube array. Devices are managed as are other files with open, close,
+read and write calls. For special operations that do not fall easily in
+those categories, the operating system supports a "special operation"
+call. These special operations are things such as setting terminal
+parameters and printer fonts.
 
 #### 5.3.6.1 Hypercube Array
-The system treats the hypercube array as a device type file. Consequently, it is allocated with an "open" command, deallocated with "close" and messages are sent and received with "write" and "read" respectively. One of the powerful features of the hypercube is that it is defined recursively and so all orders of cube are logically equivalent. When allocation is requested the user specifies in the "open" call the subcode order (N) he needs. If a subcode of that order is available, it is initialized and the nodes are numbered from 0 to 2N-1. The subcube is allocated as close as possible to the Peripheral Controller that the user's terminal is connected to. If no subcube of that size is available, the "open" returns an error condition. This allows the user to either wait for a subcube of order N to become available or to request a smaller one. Once allocated the user owns the subcude until his process terminates or he explicitly deallocates (closes) it. A degree of fault tolerance is achieved in the system because the operating system periodically runs diagnostics on the Hypercube Array and if a node fails, it is mapped out of the allocatable resource. However, the rest of the nodes are available for use. (A faulted node also causes the LED attached to its Array board to be turned off indicating a condition requiring service.)
+The system treats the hypercube array as a device type file. Consequently,
+it is allocated with an "open" command, deallocated with "close" and
+messages are sent and received with "write" and "read" respectively. One
+of the powerful features of the hypercube is that it is defined
+recursively and so all orders of cube are logically equivalent. When
+allocation is requested the user specifies in the "open" call the
+subcode order (N) he needs. If a subcode of that order is available,
+it is initialized and the nodes are numbered from 0 to 2N-1. The subcube
+is allocated as close as possible to the Peripheral Controller that the
+user's terminal is connected to. If no subcube of that size is available,
+the "open" returns an error condition. This allows the user to either
+wait for a subcube of order N to become available or to request a smaller
+one. Once allocated the user owns the subcude until his process terminates
+or he explicitly deallocates (closes) it. A degree of fault tolerance is
+achieved in the system because the operating system periodically runs
+diagnostics on the Hypercube Array and if a node fails, it is mapped
+out of the allocatable resource. However, the rest of the nodes are
+available for use. (A faulted node also causes the LED attached to its
+Array board to be turned off indicating a condition requiring service.)
 
 #### 5.3.6.2 Graphics System
-The graphics boards are also treated as device files and are allocated and managed by each user with file system calls. The special operations that are defined for the graphics devices are the graphics operations that the hardware itself supports such as line and circle drawing, fill-in, panning, etc.
+The graphics boards are also treated as device files and are allocated
+and managed by each user with file system calls. The special operations
+that are defined for the graphics devices are the graphics operations
+that the hardware itself supports such as line and circle drawing,
+fill-in, panning, etc.
 
 #### 5.3.6.3 SBX Interface
-Each System Control board in a system has three SBX connectors. One is used for the cartridge tape controller and another is dedicated to providing the Interboard Bus (a bus for moving data between Peripheral Controllers). The last SBX connector is available for custom parallel I/O applications. There are many potential uses for the SBX Interface including networking, 9 track tape drive controller, etc. Regardless of whit it is used for, it will be treated as a device by the operating system. Consequently, it is only necessary to write the appropriate device driver in order to use the standard file system calls for device management.
+Each System Control board in a system has three SBX connectors. One
+is used for the cartridge tape controller and another is dedicated to
+providing the Interboard Bus (a bus for moving data between Peripheral
+Controllers). The last SBX connector is available for custom parallel
+I/O applications. There are many potential uses for the SBX Interface
+including networking, 9 track tape drive controller, etc. Regardless of
+whit it is used for, it will be treated as a device by the operating
+system. Consequently, it is only necessary to write the appropriate
+device driver in order to use the standard file system calls for device
+management.
 
 ### 5.3.7 Initialization
-The first level initialization is accomplished by simply turning on the system in Normal mode. When the operating system is booted, it looks for a configuration file called
+The first level initialization is accomplished by simply turning on the
+system in Normal mode. When the operating system is booted, it looks
+for a configuration file called `/sys/startup`
 
-/sys/startup
+If the "startup" file exits, a shell is created that runs it as a command
+file. One example of a command that would very likely be found in the
+startup file is
 
-If the "startup" file exits, a shell is created that runs it as a command file. One example of a command that would very likely be found in the startup file is
+```
+/sys/bin/spool > /sys/spool.log
+```
 
-/sys/bin/spool>/sys/spool.log and which causes the print spooler to be run as a parallel process.
+and which causes the print spooler to be run as a parallel process.
 
-In addition, the system administrator must perform certain functions such as creating logon files for each user.
+In addition, the system administrator must perform certain functions
+such as creating logon files for each user.
 
-In addition to initializing the operating system, the hypercube array must be initialized. The initialization of individual processors is discussed in section 4.9. In this section an algorithm for initializing the system is described. The algorithm is based on a tree structure and can be more easily illustrated than described. The diagram below shows the initialization responsibility for each processor assuming there are 16 processors. The binary numbers are the processor ID's and the decimal numbers represent the stage in time of the initialization. ##STR44##
+In addition to initializing the operating system, the hypercube array
+must be initialized. The initialization of individual processors is
+discussed in section 4.9. In this section an algorithm for initializing
+the system is described. The algorithm is based on a tree structure and
+can be more easily illustrated than described. The diagram below shows
+the initialization responsibility for each processor assuming there are
+16 processors. The binary numbers are the processor ID's and the decimal
+numbers represent the stage in time of the initialization.
+
+TODO - figure with binary tree?
 
 The assembly language code that implements this algorithm is listed below.
 
 ```
-MOVW       ID,R1     ;ID is memory location                ;containing the processor IDLDPR       R1,IDREG  ;the ID is loaded into the ID                ;processor registerFFO        R1,R2     ;R2 = # of trailing zeros in IDSUBB       #1,R2     ;JL END               ;no trailing zeros => this                ;processor is a leaf on the graphLOOP: MOVW     #1,R3     ;compute ID of neighbor by                    ;complementing one of the SFTW     R2,R3     ;trailing zeros MOVW     R1,R4     ; XORW     R3,R4     ;R4 = new ID{send message length to port #(R2)}{receive status; use timeout}a. dead (timed out)b. failed self testc. parity errord. alive and well{if alive MOVW R4,ID;put new ID in memory}{send copy of code and new ID to R2}REPC       R2        ;JMP        LOOP      ;END:{look for responses and EROF}
+       MOVW ID,R1        ;ID is memory location
+                         ;containing the processor
+       IDLDPR R1,IDREG   ;the ID is loaded into the ID
+                         ;processor register
+       FFO R1,R2         ;R2 = # of trailing zeros i
+       IDSUBB #1,R2      ;
+       JL END            ;no trailing zeros => this
+                         ;processor is a leaf on the graph
+LOOP:  MOVW #1,R3        ;compute ID of neighbor by
+                         ;complementing one of the
+       SFTW R2,R3        ;trailing zeros
+       MOVW R1,R4        ;
+       XORW R3,R4        ; R4 = new ID{send message length to port #(R2)}
+                         ; {receive status; use timeout}
+                         ;     a. dead (timed out)
+                         ;     b. failed self test
+                         ;     c. parity errord. alive and well
+                         ; {if alive MOVW R4,ID;put new ID in memory}
+                         ; {send copy of code and new ID to R2}
+       REPC R2           ;
+       JMP LOOP          ;
+END:                     ;{look for responses and EROF}
 ```
 
 ### 5.3.8 Operating System Commands
-This section specifies the commands in alphabetic order that are implemented in the operating system:
+This section specifies the commands in alphabetic order that are
+implemented in the operating system:
 
-```
-ADB:           debuggerAS:            assembler (80286)ASN:           assembler ( )AT:            later executionCAT:           catenate and printCD:            change directoryCHMOD:         change protectionCMP:           file compareCN:            change nameCP:            copyDATE:          print dateDC:            desk calculatorDF:            disk free spaceDIFF:          diff. file compareDU:            disk usageECHO:          echo argumentsED:            line editorET:            terminal emulationF77:           Fortran 77 (80286)F77N:          Fortran 77 ( )GREP:          pattern searchHELP:          helpHD:            hex dumpKILL:          kill processLN:            make a linkLS:            list directoryMAIL:          local mailMAN:           print manualMESG:          messages (yes/no)MORE:          paged displayMOUNT:         mount file systemNM:            screen editor (NMACS)NSH:           shell (see SH)PASSWD:        change passwordPR:            print filePS:            process statusPSTAT:         system statusPWD:           working directoryRM:            remove fileRMLN:          remove linkROFF:          text formatterSA:            system accountingSED:           stream editorSH:            shellSHUT:          invoke RAM MonitorSLEEP:         suspend processSORT:          sort or mergeSPLIT:         split a fileSTTY:          set terminalTEE:           pipe with file saveWAIT:          wait for completionWALL:          write to all usersWHO:           display system usersWRITE:         send text
-```
+* `ADB`:           debugger
+* `AS`:            assembler (80286)
+* `ASN`:           assembler ( )
+* `AT`:            later execution
+* `CAT`:           catenate and print
+* `CD`:            change directory
+* `CHMOD`:         change protection
+* `CMP`:           file compare
+* `CN`:            change name
+* `CP`:            copy
+* `DATE`:          print date
+* `DC`:            desk calculator
+* `DF`:            disk free space
+* `DIFF`:          diff. file compare
+* `DU`:            disk usage
+* `ECHO`:          echo arguments
+* `ED`:            line editor
+* `ET`:            terminal emulation
+* `F77`:           Fortran 77 (80286)
+* `F77N`:          Fortran 77 ( )
+* `GREP`:          pattern search
+* `HELP`:          help
+* `HD`:            hex dump
+* `KILL`:          kill process
+* `LN`:            make a link
+* `LS`:            list directory
+* `MAIL`:          local mail
+* `MAN`:           print manual
+* `MESG`:          messages (yes/no)
+* `MORE`:          paged display
+* `MOUNT`:         mount file system
+* `NM`:            screen editor (NMACS)
+* `NSH`:           shell (see SH)
+* `PASSWD`:        change password
+* `PR`:            print file
+* `PS`:            process status
+* `PSTAT`:         system status
+* `PWD`:           working directory
+* `RM`:            remove file
+* `RMLN`:          remove link
+* `ROFF`:          text formatter
+* `SA`:            system accounting
+* `SED`:           stream editor
+* `SH`:            shell
+* `SHUT`:          invoke RAM Monitor
+* `SLEEP`:         suspend process
+* `SORT`:          sort or merge
+* `SPLIT`:         split a file
+* `STTY`:          set terminal
+* `TEE`:           pipe with file save
+* `WAIT`:          wait for completion
+* `WALL`:          write to all users
+* `WHO`:           display system users
+* `WRITE`:         send text
 
 ### 5.3.9 File Formats and Conventions
-In this section the data structures that are used in the operating system are specified. Most of the structures are used for managing ##STR45##
+In this section the data structures that are used in the operating system
+are specified. Most of the structures are used for managing
+```
+  processes
+    procobj
+  files
+    cactab
+    dir
+    file
+    opntab?
+  system
+    sysdata
+    sysdev
+```
 
-To fully understand some of these structures it is necessary to have a working knowledge of the 80286 (see iAPX 286 Programmer's Reference Manual from Intel for details). Some of the important characteristics of the 80286 are:
+To fully understand some of these structures it is necessary to have
+a working knowledge of the 80286 (see iAPX 286 Programmer's Reference
+Manual from Intel for details). Some of the important characteristics
+of the 80286 are:
 
-1) Memory is treated as a set of variable length (up to 64 Kbytes) segments.
+* Memory is treated as a set of variable length (up to 64 Kbytes) segments.
+* Each segment has a virtual address that consists of two parts (each
+part is two bytes)
+  *  an index (segment selector) into one of two tables of segment
+  descriptors: the Global Descriptor Table (GDT) and the Local Descriptor
+  Table (LDT).
+* The hardware recognizes some special segments and has support for fast
+task switching. These include the GDT, the LDT and the Task State Segment
+(TSS).
 
-2) Each segment has a virtual address that consists of two parts (each part is two bytes)
+In the specifications below the abbreviations have the following meanings:
+C=Constant, B=Byte, H=Halfword, W=Word, D=Double Word. If a Word is an
+address in memory then it consists of the two parts described above. If
+a Word is a disk address then it has three parts that designate cylinder,
+head and sector.
 
-a) an index (segment selector) into one of two tables of segment descriptors: the Global Descriptor Table (GDT) and the Local Descriptor Table (LDT).
-
-3) The hardware recognizes some special segments and has support for fast task switching. These include the GDT, the LDT and the Task State Segment (TSS).
-
-In the specifications below the abbreviations have the following meanings: C=Constant, B=Byte, H=Halfword, W=Word, D=Double Word. If a Word is an address in memory then it consists of the two parts described above. If a Word is a disk address then it has three parts that designate cylinder, head and sector. ##STR46##
+```
+CACTAB(5)
+NAME
+cactab - format of the sector buffer cache table
+```
 
 DESCRIPTION
-The file system maintains a cache of buffers for disk sectors to minimize the actual disk traffic. The number of buffers is set by the system variable "caccnt". When the buffers are all full and a sector must be read that is not in a buffer, the least recently used buffer is used for the new sector. Therefore, the buffers are arranged in a linked list with a system variable "lruptr" pointing to the least recently used buffer. The entries in the sector buffer cache table (which is located at "cactab") are called sector buffer descriptors ("sucbufdes") and are specified below.
+The file system maintains a cache of buffers for disk sectors to
+minimize the actual disk traffic. The number of buffers is set by the
+system variable "caccnt". When the buffers are all full and a sector
+must be read that is not in a buffer, the least recently used buffer is
+used for the new sector. Therefore, the buffers are arranged in a linked
+list with a system variable "lruptr" pointing to the least recently used
+buffer. The entries in the sector buffer cache table (which is located
+at "cactab") are called sector buffer descriptors ("sucbufdes") and are
+specified below.
+
 
 ```
 secbufdes -- format of a sector buffer descriptorH       caclruf  ;least recently used link forwardH       caclrup  ;least recently used link backwardB       cacst    ;buffer status (see below)/access countB       cacmod   ;buffer modifiedH       cacchn   ;lock chain for bufferH       cacchne  ;H       cacdev   ;device number (*2) for bufferW       cacadr   ;disk address of bufferbufstC       unchanged = 0               ;buffer not saved on swap ????C       modified = 1               ;buffer modified (saved on swap)SEE ALSOsysdata(5)DIR(5)                      DIR(5)NAMEdir -- format of a directory
