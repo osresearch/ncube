@@ -440,6 +440,9 @@ the destination may appear positive even when N indicates negative.
 ### 4.8.2 Instruction Definitions
 
 #### ADC - ADD WITH CARRY
+The Carry and source values are added to the destination and the result
+replaces the destination.
+
 Opcodes:
 ```
   50     ADCB       ADd with Carry Byte
@@ -461,14 +464,15 @@ Flags:
   * `V` ← Integer overflow
   * `U` ← 0
 
-Description:
-  The Carry and source values are added to the destination and the result
-  replaces the destination.
-
 Exceptions:
   * Integer overflow
 
+
 #### ADCD - ADD WITH CARRY DECIMAL
+The Carry and source value (treated as a two decimal value) are added to
+the destination (also considered as a two decimal value) and the result
+replaces the destination. No check for invalid BCD encoding is made.
+
 Opcode:
 ```
   81     ADCD       ADd with Carry Decimal
@@ -488,16 +492,14 @@ Flags:
   * `V` ← 0
   * `U` ← 0
 
-Description:
-  The Carry and source value (treated as a two decimal value) are added
-  to the destination (also considered as a two decimal value) and the
-  result replaces the destination. No check for invalid BCD encoding
-  is made.
-
 Exceptions:
   * none
 
+
 #### ADD - ADD
+The source is added to the destination and the result is stored at the
+address of the destination.
+
 Opcodes:
 ```
   40     ADDB       ADD Byte
@@ -533,10 +535,6 @@ Flags:  (Floating Point Operations: `ADDR,ADDL`)
   * `OF` ← des overflowed
   * `IN` ← dsrc or src = Nan
 
-Description:
-  The source is added to the destination and theresult is stored at the
-  address of the destination.
-
 Exceptions:
   * Integer overflow
   * Inexact
@@ -544,7 +542,11 @@ Exceptions:
   * Overflow
   * Invalid
 
+
 #### AND - AND
+The destination operand is anded with the source and the result is stored
+at the destination address.
+
 Opcodes:
 ```
   41     ANDB       AND Byte
@@ -566,13 +568,23 @@ Flags:
  * `V` ← 0
  * `U` ← 0
 
-Description:
-  The destination operand is anded with the sourceand the result is stored at the destination address.
-
 Exceptions:
   * none
 
+
 #### B - Branch
+The Branch instructions are relative in the literal immediate
+and register direct modes and use the value of the PC at the
+beginning of the instruction. In all other modes the address of
+the source operand replaces the PC. The Invalid exception results
+when comparison accesses at least one Nan and a signed branch is
+performed on the result. The unsigned branches should be used
+for the predicates defined in the IEEE Floating Point Standard
+that must not fault. The Repeat Mode is reset after decrementing
+the counter and testing the termination condition so that if a
+REPeat instruction precedes a branch they act together like a
+"loop" instruction.
+
 Opcodes:
 ```
   DF     JMP     Unconditional       JuMP unconditional
@@ -607,24 +619,18 @@ Flags:
   (REP ← 00) after decrementing the counter and checking the condition
   (see below).
 
-Description:
-  The Branch instructions are relative in the literal immediate
-  and register direct modes and use the value of the PC at the
-  beginning of the instruction. In all other modes the address of
-  the source operand replaces the PC. The Invalid exception results
-  when comparison accesses at least one Nan and a signed branch is
-  performed on the result. The unsigned branches should be used
-  for the predicates defined in the IEEE Floating Point Standard
-  that must not fault. The Repeat Mode is reset after decrementing
-  the counter and testing the termination condition so that if a
-  REPeat instruction precedes a branch they act together like a
-  "loop" instruction.
-
 Exceptions:
   * Invalid (BG,BGE,BL,BLE when U = 1);
   * Illegal Address (Immediate mode)
 
+
 #### BCNT - BROADCAST COUNT
+The Output Count registers whose numbers correspond to bit positions in
+des that are set to one are loaded with the src value. The Output
+Count registers are numbered 32,33. . .,41,63 so the bit positions
+in des are understood to be offset by 32. Both src and des are
+Word values.
+
 Opcode:
 ```
   C5     BCNT       Broadcast CouNT
@@ -640,18 +646,15 @@ Operation:
 Flags:
   * no changes
 
-Description:
-   The Output Count registers whose numbers correspond to bit positions in
-   des that are set to one are loaded with the src value. The Output
-   Count registers are numbered 32,33. . .,41,63 so the bit positions
-   in des are understood to be offset by 32. Both src and des are
-   Word values.
-
 Exceptions:
   * none
 
+
 #### BIT - BIT TEST
-Opcodes
+The Z Flag is set to 0 if all the bits of src that are masked by dsrc
+are 0. Neither src nor dsrc is changed.
+
+Opcodes:
 ```
   61     BITB       BIT test Byte
   63     BITH       BIT test Halfword
@@ -670,16 +673,16 @@ Flags:
   * N ← (src AND dsrc) < 0
   * Z ← (src AND dsrc) = 0
   * V ← 0
-  * U ← 0
-
-Description:
-   The Z Flag is set to 0 if all the bits of src that are masked by dsrc
-   are 0. Neither src nor dsrc is changed.
+  * `U` ← 0
 
 Exceptions:
   * none
 
+
 #### BKPT - BREAKPOINT
+This one byte instruction is used by a debugger to set breakpoints
+in a user's program.
+
 Opcode:
 ```
   6B     BKPT       BreaKPoinT
@@ -698,10 +701,6 @@ Operation:
 ```
 Flags:
   * all flags set according to the new PS
-
-Description:
-   This one byte instruction is used by a debugger to set breakpoints
-   in a user's program.
 
 Exceptions:
   * none
@@ -732,7 +731,21 @@ Description:
 Exceptions:
   * none
 
+
 #### CALL - CALL
+The current value of the Program Counter (PC) is pushed on the stack
+and by loading the PC with a new value a branch to a subroutine is
+taken. If the CALL is preceded by a REPEAT instruction the counter is
+decremented and the termination condition is checked. The Repeat Mode is
+reset (REP ← 00) and if termination is not reached then the return
+address that is pushed on the stack points to the REPEAT instruction. If
+termination is reached the CALL instruction is skipped. This enables
+the processor to execute multiple CALLs. If there is no preceding
+REPEAT then the saved return address points to the beginning of the
+instruction following the CALL. If the addressing mode is Literal,
+Immediate or Register Direct the call is relative and uses the value
+of PC at the beginning of the CALL instruction.
+
 Opcode:
 ```
   CF     CALL       CALL
@@ -753,24 +766,13 @@ Operation:
 Flags:
   * no changes except REP ← 00 (see below)
 
-Description:
-The current value of the Program Counter (PC) is pushed on the stack
-and by loading the PC with a new value a branch to a subroutine is
-taken. If the CALL is preceded by a REPEAT instruction the counter is
-decremented and the termination condition is checked. The Repeat Mode is
-reset (REP ← 00) and if termination is not reached then the return
-address that is pushed on the stack points to the REPEAT instruction. If
-termination is reached the CALL instruction is skipped. This enables
-the processor to execute multiple CALLs. If there is no preceding
-REPEAT then the saved return address points to the beginning of the
-instruction following the CALL. If the addressing mode is Literal,
-Immediate or Register Direct the call is relative and uses the value
-of PC at the beginning of the CALL instruction.
-
 Exceptions:
   * Illegal Address (Immediate mode)
 
+
 #### CLC - CLEAR CARRY
+The Carry Flag is set to zero.
+
 Opcode:
 ```
   1B     CLC        CLear Carry
@@ -786,13 +788,13 @@ Operation:
 Flags:
   * C ← 0   no other changes
 
-Description:
-The Carry Flag is set to zero.
-
 Exceptions:
   * none
 
+
 #### CMC - COMPLEMENT CARRY
+The Carry Flag is reversed.
+
 Opcode:
 ```
   3B     CMC        CoMplement Carry
@@ -808,13 +810,18 @@ Operation:
 Flags:
   * C ← not(C)   no other changes
 
-Description:
-The Carry Flag is reversed.
-
 Exceptions:
   * none
 
+
 #### CMP - COMPARE
+The value src is compared to dsrc and the appropriate flags are set for
+subsequent conditional branching. Neither src nor dsrc is changed. The
+Carry flag is set by the Floating Point comparisons so that the Unsigned
+branches can be used for the Unordered predicates defined in the
+IEEE Floating Point Standard. Also if either src or dsrc is Nan the
+appropriate Invalid exception is signaled by the branch instruction.
+
 Opcodes:
 ```
   30     CMPB       CoMPare Byte
@@ -836,32 +843,28 @@ Flags:  (Integer Operations: CMPB,CMPH,CMPW)
   * N ← tem < 0
   * Z ← tem = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operations: CMPR,CMPL)
   * C ← tem < 0
   * N ← tem < 0
   * Z ← tem = 0
   * V ← 0
-  * U ← src or dsrc = Nan
+  * `U` ← src or dsrc = Nan
   * IX ← 0
   * UF ← 0
   * FZ ← 0
   * OF ← 0
   * IN ← 0
 
-Description:
-The value src is compared to dsrc and the appropriate flags are set for
-subsequent conditional branching. Neither src nor dsrc is changed. The
-Carry flag is set by the Floating Point comparisons so that the Unsigned
-branches can be used for the Unordered predicates defined in the
-IEEE Floating Point Standard. Also if either src or dsrc is Nan the
-appropriate Invalid exception is signaled by the branch instruction.
-
 Exceptions:
   * none
 
+
 #### CV - CONVERT
+The source operand is converted to the type and length indicated by the
+destination specifier and stored at the address of the destination.
+
 Opcodes:
 ```
   09     CVBR     ConVert Byte to Real
@@ -891,16 +894,12 @@ Flags:  (All Operations)
   * Z ← des = 0
   * V ← Integer overflow (when des is INTEGER)
   * V ← 0  (when des is FLOATING POINT)
-  * U ← 0
+  * `U` ← 0
   * IX ← des rounded
   * UF ← des underflowed
   * FZ ← 0
   * OF ← des overflowed
   * IN ← src = Nan
-
-Description:
-The source operand is converted to the type and length indicated by the
-destination specifier and stored at the address of the destination.
 
 Exceptions:
   * Integer overflow [CVWB,CVWH,CVRW,CVLW]
@@ -909,7 +908,11 @@ Exceptions:
   * Overflow [CVLR]
   * Invalid [CVRL,CVLR]
 
+
 #### DI - DISABLE INTERRUPTS
+The Interrupt Enable (IE) flag in the Program Status register is set to
+zero. This disables all interrupts that can be disabled.
+
 Opcode:
 ```
    9B    DI         Disable Interrupts
@@ -925,14 +928,14 @@ Operation:
 Flags:
   * IE ← 0   no other changes
 
-Description:
-The Interrupt Enable (IE) flag in the Program Status register is set to
-zero. This disables all interrupts that can be disabled.
-
 Exceptions:
   * none
 
+
 #### DIV - DIVIDE
+The destination is divided by the source and the result is stored at
+the destination address.
+
 Opcodes:
 ```
   A0     DIVB       DIVide Byte
@@ -954,23 +957,19 @@ Flags:  (Integer Operations: DIVB,DIVH,DIVW)
   * N ← des < 0
   * Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operations: DIVR,DIVL)
   * C ← des < 0
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← des rounded
   * UF ← des underflowed
   * FZ ← (src = 0 and des <> 0)
   * OF ← des overflowed
   * IN ← (src of dsrc = Nan) or (src and dsrc = 0)
-
-Description:
-The destination is divided by the source and the result is stored at
-the destination address.
 
 Exceptions:
   * Integer overflow (dsrc = largest negative value, src = -1)
@@ -981,7 +980,11 @@ Exceptions:
   * Overflow
   * Invalid
 
+
 #### DVR - DIVIDE REVERSE
+The source operand is divided by the destination operand and the result
+is stored at the address of the destination.
+
 Opcodes:
 ```
   B0    DVRB       DIVide Reverse Byte
@@ -1002,23 +1005,19 @@ Flags:  (Integer Operations: DVRB,DVRH,DVRW)
   * C ← C
   * N ← des < 0Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operations: DVRR,DVRL)
   * C ← des < 0
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← des rounded
   * UF ← des underflowed
   * FZ ← (des = 0 and src <> 0)
   * OF ← des overflowed
   * IN ← (src or dsrc = Nan) or (src and dsrc = 0)
-
-Description:
-The source operand is divided by the destination operand and the result
-is stored at the address of the destination.
 
 Exceptions:
   * Integer overflow (src = largest negative value, dsrc = 1)
@@ -1029,7 +1028,11 @@ Exceptions:
   * Overflow
   * Invalid
 
+
 #### EI - ENABLE INTERRUPTS
+The Interrupt Enable (IE) flag in the Program Status register is set to
+one. This enables all interrupts that have not been otherwise disabled.
+
 Opcode:
 ```
   8B     EI         Enable Interrupts
@@ -1045,14 +1048,14 @@ Operation:
 Flags:
   * IE ←1   no other changes
 
-Description:
-The Interrupt Enable (IE) flag in the Program Status register is set to
-one. This enables all interrupts that have not been otherwise disabled.
-
 Exceptions:
   * none
 
+
 #### ER - ERROR
+Error on and off are used to set a pin level in order to indicate a
+potentially fatal condition (see 4.5).
+
 Opcodes:
 ```
   4B     ERON       ERror ON
@@ -1070,14 +1073,18 @@ Operation:
 Flags:
   * no changes
 
-Description:
-Error on and off are used to set a pin level in order to indicate a
-potentially fatal condition (see 4.5).
-
 Exceptions:
   * none
 
+
 #### FFO - FIND FIRST ONE
+If the source is zero the destination is set to 8 (FFOB), 16 (FFOH) or
+32 (FFOW) and the Z Flag is set to one. Otherwise, Z is zero and the
+destination is set to the bit position of the first one bit in the
+source, scanning from the right (e.g. if the least significant bit is
+one the destination is set to zero). The destination is a Byte even
+though the source can be a Byte (FFOB), Halfword (FFOH) or Word (FFOW).
+
 Opcodes:
 ```
   31     FFOB       Find First One Byte
@@ -1097,20 +1104,21 @@ Flags:
   * N ← 0
   * Z ← src = 0
   * V ← 0
-  * U ← 0
-
-Description:
-If the source is zero the destination is set to 8 (FFOB), 16 (FFOH) or
-32 (FFOW) and the Z Flag is set to one. Otherwise, Z is zero and the
-destination is set to the bit position of the first one bit in the
-source, scanning from the right (e.g. if the least significant bit is
-one the destination is set to zero). The destination is a Byte even
-though the source can be a Byte (FFOB), Halfword (FFOH) or Word (FFOW).
+  * `U` ← 0
 
 Exceptions:
   * none
 
+
 #### LCNT - LOAD COUNT
+The I/O Count Register designated by the destination is loaded with the
+source operand, The Input Registers are numbered 0,1,. . .,9,31 and
+the Output Registers are 32,33,. . .,41,63. The least significant bit
+of the Count Register is always zero but no error is signaled if an
+attempt is made to load an odd number. Also no error is signaled if
+des is greater than 63 but the result is undefined. The source operand
+is a Word and the destination is a Byte.
+
 Opcode:
 ```
   A5     LCNT       Load CouNT
@@ -1126,35 +1134,11 @@ Operation:
 Flags:
   * no changes
 
-Description:
-The I/O Count Register designated by the destination is loaded with the
-source operand, The Input Registers are numbered 0,1,. . .,9,31 and
-the Output Registers are 32,33,. . .,41,63. The least significant bit
-of the Count Register is always zero but no error is signaled if an
-attempt is made to load an odd number. Also no error is signaled if
-des is greater than 63 but the result is undefined. The source operand
-is a Word and the destination is a Byte.
-
 Exceptions:
   * none
 
-#### LDPR - LOAD PROCESSOR REGISTERS
-Opcode:
-```
-  85     LDPR       LoaD Processor Register
-```
-AssemblerSyntax:
-```
- LDPR src,des
-```
-Operation:
-```
-  src → Processor Register #(des)
-```
-Flags:
-  * no changes
 
-Description:
+#### LDPR - LOAD PROCESSOR REGISTERS
 The source value is loaded into the Processor Register designated
 by the destination. The Processor Registers are listed below. No
 operation is performed if a "read only" register is designated
@@ -1175,10 +1159,32 @@ value indicating one of the Processor Registers.
   P11   IO     Input Overrun (read only)
 ```
 
+Opcode:
+```
+  85     LDPR       LoaD Processor Register
+```
+AssemblerSyntax:
+```
+ LDPR src,des
+```
+Operation:
+```
+  src → Processor Register #(des)
+```
+Flags:
+  * no changes
+
 Exceptions:
- * none
+  * none
+
 
 #### LPTR - LOAD POINTER
+The I/O Address Register designated by the destination is loaded with
+the source operand. The Input Registers are numbered 0,1,. . .,9,31 and
+the Output Registers are 32,33,. . .,41,63. The least significant bit
+of the Address Register is always zero but no error is signaled if an
+attempt is made to load an odd address. Both operands are Words.
+
 Opcode:
 ```
   B5     LPTR       Load PoinTeR
@@ -1194,17 +1200,13 @@ Operation:
 Flags:
   * no changes
 
-Description:
-The I/O Address Register designated by the destination is loaded with
-the source operand. The Input Registers are numbered 0,1,. . .,9,31 and
-the Output Registers are 32,33,. . .,41,63. The least significant bit
-of the Address Register is always zero but no error is signaled if an
-attempt is made to load an odd address. Both operands are Words.
-
 Exceptions:
   * none
 
+
 #### MOV - MOVE
+The source value is moved to the destination address.
+
 Opcodes:
 ```
   00     MOVB       MOVe Byte
@@ -1224,13 +1226,18 @@ Operation:
 Flags:
   * no changes
 
-Description:
-The source value is moved to the destination address.
-
 Exceptions:
   * none
 
+
 #### MOVA - MOVE ADDRESS
+The address specifier of the source operand is evaluated and stored at
+the destination location. If the addressing mode of the source is
+Literal, Immediate or Register Direct the PC is first added to the
+source value. The value of PC used is that at the beginning of the
+instruction. If the source addressing mode is Stack mode then the
+contents of the Stack Pointer are moved to the destination.
+
 Opcode:
 ```
   E5     MOVA       MOVe Address
@@ -1249,18 +1256,17 @@ Operation:
 Flags:
   * no changes
 
-Description:
-The address specifier of the source operand is evaluated and stored at
-the destination location. If the addressing mode of the source is
-Literal, Immediate or Register Direct the PC is first added to the
-source value. The value of PC used is that at the beginning of the
-instruction. If the source addressing mode is Stack mode then the
-contents of the Stack Pointer are moved to the destination.
-
 Exceptions:
   * Illegal Address
 
+
 #### MUL - MULTIPLY
+The source and destination are multiplied and the result is stored
+at the address of the destination. Integer overflow occurs when the
+high order half of the product is not the sign extension of the low
+order half. This is true even when the operands are bytes or halfwords
+in registers.
+
 Opcodes:
 ```
   80     MULB       MULtiply Byte
@@ -1282,26 +1288,19 @@ Flags:  (Integer Operations: MULB,MULH,MULW)
   * N ← des < 0
   * Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operatios: MULR,MULL)
   * C ← des < 0
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← des rounded
   * UF ← des underflowed
   * FZ ← 0
   * OF ← des overflowed
   * IN ← dsrc or src = Nan
-
-Description:
-The source and destination are multiplied and the result is stored
-at the address of the destination. Integer overflow occurs when the
-high order half of the product is not the sign extension of the low
-order half. This is true even when the operands are bytes or halfwords
-in registers.
 
 Exceptions:
   * Integer overflow
@@ -1310,7 +1309,12 @@ Exceptions:
   * Overflow
   * Invalid
 
+
 #### NEG - NEGATE
+The source operand is negated and the result is stored at the address
+of the destination. Integer overflow occurs when the source is the
+largest negative number.
+
 Opcodes:
 ```
   10     NEGB       NEGate Byte
@@ -1332,30 +1336,28 @@ Flags:  (Integer Operations: NEGB,NEGH,NEGW)
   * N ← des ← 0    TODO - verify this
   * Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operations: NEGR,NEGL)
   * C ← des < 0
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← 0
   * UF ← 0
   * FZ ← 0
   * OF ← 0
   * IN ← src = Nan
 
-Description:
-The source operand is negated and the result is stored at the address
-of the destination. Integer overflow occurs when the source is the
-largest negative number.
-
 Exceptions:
   * Integer overflow
   * Invalid
 
+
 #### NOP - NO OPERATION
+This instruction does nothing.
+
 Opcode:
 ```
   0B     NOP        NO oPeration
@@ -1371,13 +1373,14 @@ Operation:
 Flags:
   * no changes
 
-Description:
-This instruction does nothing.
-
 Exceptions:
   * none
 
+
 #### NOT - NOT
+The source is complemented and the result is stored at the destination
+location.
+
 Opcodes:
 ```
   71     NOTB       NOT Byte
@@ -1397,16 +1400,16 @@ Flags:
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
-
-Description:
-The source is complemented and the result is stored at the destination
-location.
+  * `U` ← 0
 
 Exceptions:
   * none
 
+
 #### OR - OR
+The destination and source are "ored" together and the result is stored
+at the address of the destination.
+
 Opcodes:
 ```
   51     ORB        OR Byte
@@ -1426,16 +1429,19 @@ Flags:
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
-
-Description:
-The destination and source are "ored" together and the result is stored
-at the address of the destination.
+  * `U` ← 0
 
 Exceptions:
   * none
 
+
 #### REM - REMAINDER
+The remainder of the destination divided by the source replaces the
+destination. The following point instruction is used for argument
+reduction and is always exact. However, it is only a partial remainder;
+the instruction must be repeated until Z becomes one (that is the
+reason for the unusual definition of the Z flag).
+
 Opcodes:
 ```
   90     REMB       REMainder Byte
@@ -1457,58 +1463,27 @@ Flags:  (integer Operations: REMB,REMH,REMW)
   * N ← des < 0
   * Z ←  des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operations: REMR,REML)
   * C ← des < 0
   * N ← des < 0
   * Z ← abs(des) < abs(src)
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← 0
   * UF ← des underflowed
   * FZ ← 0
   * OF ← 0
   * IN ← (dsrc or src = Nan) or (src = 0)
 
-Description:
-The reaminder of the destination divided by the source replaces the
-destination. The following point instruction is used for argument
-reduction and is always exact. However, it is only a partial remainder;
-the instruction must be repeated until Z becomes one (that is the
-reason for the unusual definition of the Z flag).
-
 Exceptions:
   * Integer Zero Divide
   * Underflow
   * Invalid
 
+
 #### REP - REPEAT
-Opcodes:
-```
-  1E    REP       REPeat while Count not Zero
-  2E    REPZ      REPeat while Zero flag set
-  3E    REPNZ     REPeat while zero flag Not set
-```
-AssmeblerSyntax:
-```
-REP{,Z,NZ} src
-```
-Operation:
-```
-  REP: PS(30,31) ← 01; Count = REG#(src)
-  REPZ: PS(30,31) ← 10; Count = REG#(src); Z = 1
-  REPNZ: PS(30,31) ← 11; Count = REG#(src); Z = 0
-    for all: PS(26,27,28,29) ← Count
-      after repeat condition satisfied (on REPZ and RPNZ
-      the Z flag is checked before the Count)
-      PS(30,31) ← 00
-```
-
-Flags:
-  * no changes
-
-Description:
 A REPeat instruction may precede and other instruction. It causes bits
 26 to 31 in the Program Status register to be set as shown above. The
 instruction following the repeat is reexecuted and the indicated count
@@ -1549,10 +1524,38 @@ by R4 and
 
 will compute the inner product of the two vectors.
 
+Opcodes:
+```
+  1E    REP       REPeat while Count not Zero
+  2E    REPZ      REPeat while Zero flag set
+  3E    REPNZ     REPeat while zero flag Not set
+```
+AssmeblerSyntax:
+```
+REP{,Z,NZ} src
+```
+Operation:
+```
+  REP: PS(30,31) ← 01; Count = REG#(src)
+  REPZ: PS(30,31) ← 10; Count = REG#(src); Z = 1
+  REPNZ: PS(30,31) ← 11; Count = REG#(src); Z = 0
+    for all: PS(26,27,28,29) ← Count
+      after repeat condition satisfied (on REPZ and RPNZ
+      the Z flag is checked before the Count)
+      PS(30,31) ← 00
+```
+
+Flags:
+  * no changes
+
 Exceptions:
   * address
 
+
 #### RET - RETURN
+The contents of the stack top (assumed to be a return address) are popped
+into the Program Counter.
+
 Opcode:
 ```
   EB     RET        RETurn
@@ -1568,14 +1571,15 @@ Operation:
 Flags:
   * no changes (the Repeat Mode is reset)
 
-Description:
-The contents of the stack top (assumed to be a return address) are popped
-into the Program Counter.
-
 Exceptions:
   * none
 
+
 #### RETI - RETURN FROM INTERRUPT
+The top of stack (assumed to contain the PC in effect before the current
+interrupt) is popped into the PC register and then the next value on
+the stack is popped into the Program Status (PS) register.
+
 Opcode:
 ```
   CB     RETI       RETurn from Interrupt
@@ -1592,15 +1596,15 @@ Operation:
 Flags:
   * All flags set according to the new PS
 
-Description:
-The top of stack (assumed to contain the PC in effect before the current
-interrupt) is popped into the PC register and then the next value on
-the stack is popped into the Program Status (PS) register.
-
 Exceptions:
   * none
 
+
 #### RETP - RETURN AND POP
+The top of stack is popped into the Program Counter and then the source
+(Word) value is added to the Stack Pointer in order to pop a set of
+local variables off the stack.
+
 Opcode:
 ```
   EF     RETP       RETurn and Pop
@@ -1617,15 +1621,18 @@ Operation:
 Flags:
   * no changes (the Repeat Mode is reset)
 
-Description:
-The top of stack is popped into the Program Counter and then the source
-(Word) value is added to the Stack Pointer in order to pop a set of
-local variables off the stack.
-
 Exceptions:
   * none
 
+
 #### ROT - ROTATE
+If the source is zero the destination is not changed but the Carry
+flag is set to the least significant bit of dsrc. Otherwise dsrc is
+rotated (left if src < 0; right of src > 0) and the Carry flag is set
+to the value of the last bit shifted out. The source is always a Byte
+operand even though the destination can be a Byte (ROTB), Halfword
+(ROTH) or Word (ROTW).
+
 Opcodes:
 ```
   21     ROTB       ROTate Byte
@@ -1646,20 +1653,18 @@ Flags:
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
-
-Description:
-If the source is zero the destination is not changed but the Carry
-flag is set to the least significant bit of dsrc. Otherwise dsrc is
-rotated (left if src < 0; right of src > 0) and the Carry flag is set
-to the value of the last bit shifted out. The source is always a Byte
-operand even though the destination can be a Byte (ROTB), Halfword
-(ROTH) or Word (ROTW).
+  * `U` ← 0
 
 Exceptions:
   * none
 
+
 #### RSET - RESET
+RSET causes the Integer and Floating point Execution units to be
+initialized and all pending interrupts to be reset. All I/O activity
+is aborted. The serial channel "ready" flags are set to one (ready)
+and all other I/O registers are cleared including error flags.
+
 Opcode:
 ```
   7B     RSET       ReSET processor
@@ -1675,16 +1680,14 @@ Operation:
 Flags:
   * no changes
 
-Description:
-RSET causes the Integer and Floating point Execution units to be
-initialized and all pending interrupts to be reset. All I/O activity
-is aborted. The serial channel "ready" flags are set to one (ready)
-and all other I/O registers are cleared including error flags.
-
 Exceptions:
   * none
 
+
 #### SBB - SUBTRACT WITH BORROW
+The Carry (borrow) and source values are subtracted from the destination
+and the result replaces the destination.
+
 Opcodes:
 ```
   70     SBBB     SuBtract with Borrow Byte
@@ -1704,16 +1707,18 @@ Flags:
   * N ← des < 0
   * Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
-
-Description:
-The Carry (borrow) and source values are subtracted from the destination
-and the result replaces the destination.
+  * `U` ← 0
 
 Exceptions:
   * Integer overflow
 
+
 #### SBBD - SUBTRACT DECIMAL
+The Carry value (borrow) and source (Byte) value treated as a two
+BCD digit value are subtracted from the destination considered
+similarly. The result replaces the destination. The operands are
+not checked for invalid BCD format.
+
 Opcode:
 ```
   91     SBBD     SuBtract with Borrow Decimal
@@ -1731,18 +1736,16 @@ Flags:
   * N ← 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
-
-Description:
-The Carry value (borrow) and source (Byte) value treated as a two
-BCD digit value are subtracted from the destination considered
-similarly. The result replaces the destination. The operands are
-not checked for invalid BCD format.
+  * `U` ← 0
 
 Exceptions:
   * none
 
+
 #### SBR - SUBTRACT REVERSE
+The destination value is subtracted from the source and the result
+replaces the destination.
+
 Opcodes:
 ```
   20     SBRB       SuBtract Reverse Byte
@@ -1764,23 +1767,19 @@ Flags:  (Integer Operations: SBRB,SBRH,SBRW)
   * N ← des < 0
   * Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operations: SBRR,SBRL)
   * C ← des < 0
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ←  des rounded
   * UF ← des underflowed
   * FZ ← 0
   * OF ← des overflowed
   * IN ← src or dsrc = Nan
-
-Description:
-The destination value is subtracted from the source and the result
-replaces the destination.
 
 Exceptions:
   * Integer overflow
@@ -1789,7 +1788,21 @@ Exceptions:
   * Overflow
   * Invalid
 
+
 #### SFA - SHIFT ARITHMETIC
+If the source is zero the destination is unchanged and the Carry flag
+is set to the least significant bit of the destination. Otherwise,
+the operand at the destination address is shifted by the number of
+places equal to the value of the source. If the source is positive the
+shift is to the left and if negative it is to the right. Left shifts
+cause zero to be shifted in from the right and right shifts cause the
+sign to be copied from the left. In both cases the Carry flag is set
+to the last bit shifted out. If the shift is right Integer overflow
+cannot occur but left shifts cause Integer overflow if the bits
+shifted out are not all equal to the resulting sign bit. The source
+operand is always a Byte operand even though the destination can be
+a Byte (SFAB), Halfword (SFAH) or Word (SFAW).
+
 Opcodes:
 ```
   11     SFAB       ShiFt Arithmetic Byte
@@ -1810,26 +1823,24 @@ Flags:
   * N ← src < 0
   * Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
-
-Description:
-If the source is zero the destination is unchanged and the Carry flag
-is set to the least significant bit of the destination. Otherwise,
-the operand at the destination address is shifted by the number of
-places equal to the value of the source. If the source is positive the
-shift is to the left and if negative it is to the right. Left shifts
-cause zero to be shifted in from the right and right shifts cause the
-sign to be copied from the left. In both cases the Carry flag is set
-to the last bit shifted out. If the shift is right Integer overflow
-cannot occur but left shifts cause Integer overflow if the bits
-shifted out are not all equal to the resulting sign bit. The source
-operand is always a Byte operand even though the destination can be
-a Byte (SFAB), Halfword (SFAH) or Word (SFAW).
+  * `U` ← 0
 
 Exceptions:
   * Integer overflow
 
+
 #### SFT - SHIFT LOGICAL
+If the source is zero the destination is unchanged and the Carry flag
+is set to the least significant bit of the destination. Otherwise, the
+operand at the destination address is shifted by the number of places
+equal to the value of the source. If the source is positive the shift
+is to the left and if negative it is to the right. Left shifts cause
+zero to be shifted in from the right and right shifts cause zero to be
+shifted in from the left. In both cases the Carry flag is set to the
+last bit shifted out. The source operand is always a Byte operand even
+though the destination can be a Byte (SFTB), Halfword (SFTH) or Word
+(SFTW).
+
 Opcodes:
 ```
   01     SFTB       ShiFT logical Byte
@@ -1850,23 +1861,15 @@ Flags:
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
-Description:
-If the source is zero the destination is unchanged and the Carry flag
-is set to the least significant bit of the destination. Otherwise, the
-operand at the destination address is shifted by the number of places
-equal to the value of the source. If the source is positive the shift
-is to the left and if negative it is to the right. Left shifts cause
-zero to be shifted in from the right and right shifts cause zero to be
-shifted in from the left. In both cases the Carry flag is set to the
-last bit shifted out. The source operand is always a Byte operand even
-though the destination can be a Byte (SFTB), Halfword (SFTH) or Word
-(SFTW).
+  * `U` ← 0
 
 Exceptions:
   * none
 
+
 #### SGN - SET SIGN
+The sign of the destination is set to the sign of the source.
+
 Opcodes:
 ```
   78     SGNR       Set siGN Real
@@ -1885,20 +1888,21 @@ Flags:
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← 0
   * UF ←  0
   * FZ ← 0
   * OF ← 0
   * IN ← src or dsrc = Nan
 
-Description:
-The sign of the destination is set to the sign of the source.
-
 Exceptions:
   * Invalid
 
+
 #### SQT - SQUARE ROOT
+The square root of the source replaces the destination. The square root
+is correctly rounded and connot overflow or underflow.
+
 Opcodes:
 ```
   58     SQRT       SQuare rooT Real
@@ -1917,22 +1921,21 @@ Flags:
   * N ← 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← des rounded
   * UF ← 0
   * FZ ← 0
   * OF ← 0
   * IN ← (src < 0) or (src = Nan)
 
-Description:
-The square root of the source replaces the destination. The square root
-is correctly rounded and connot overflow or underflow.
-
 Exceptions:
   * Inexact
   * Invalid
 
+
 #### STC - SET CARRY
+The Carry flag is set to one.
+
 Opcode:
 ```
   2B     STC        SeT Carry
@@ -1948,33 +1951,11 @@ Operation:
 Flags:
   * C ← 1   no other changes
 
-Description:
-The Carry flag is set to one.
-
 Exceptions:
   * none
 
-#### STPR - STORE PROCESSOR REGISTERS
-Opcode:
-```
-  95     STPR       STore Processor Registers
-```
-AssemblerSyntax:
-```
- STPR src,des
-```
-Operation:
-```
-  PROCESSOR REGISTER # (src) → des
-```
-Flags:
-  * C ← C
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
-  * U ← 0
 
-Description:
+#### STPR - STORE PROCESSOR REGISTERS
 The contents of the Processor Register whose number corresponds with
 the value of the source replaces the destination. The destination
 is a Word and the source is a Byte value designating a Processor
@@ -1994,10 +1975,33 @@ Register. The Processor Registers are listed below.
   P11 IOInput Overrun (read only)
 ```
 
+Opcode:
+```
+  95     STPR       STore Processor Registers
+```
+AssemblerSyntax:
+```
+ STPR src,des
+```
+Operation:
+```
+  PROCESSOR REGISTER # (src) → des
+```
+Flags:
+  * C ← C
+  * N ← des < 0
+  * Z ← des = 0
+  * V ← 0
+  * `U` ← 0
+
 Exceptions:
   * none
 
+
 #### SUB - SUBTRACT
+The source is subtracted from the destination and the result is stored
+at the address of the destination.
+
 Opcodes:
 ```
   60     SUBB       SUBtract Byte
@@ -2019,23 +2023,19 @@ Flags:  (Integer Operations: SUBB,SUBH,SUBW)
   * N ← des < 0
   * Z ← des = 0
   * V ← Integer overflow
-  * U ← 0
+  * `U` ← 0
 
 Flags:  (Floating Point Operations: SUBR,SUBL)
   * C ← des < 0
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
+  * `U` ← 0
   * IX ← des rounded
   * UF ← des underflowed
   * FZ ← 0
   * OF ← des overflowed
   * IN ← src or dsrc = Nan
-
-Description:
-The source is subtracted from the destination and the result is stored
-at the address of the destination.
 
 Exceptions:
   * Integer overflow
@@ -2044,7 +2044,12 @@ Exceptions:
   * Overflow
   * Invalid
 
+
 #### TRAP - TRAP
+The current values of PS and PC are pushed on the stack and the value
+at location (8 * src) replaces the PC while the value at location (8 *
+src + 4) replaces the PS. The source operand is an unsigned Byte.
+
 Opcode:
 ```
   1E     TRAP       TRAP
@@ -2064,15 +2069,14 @@ Operation:
 Flags:
   * all flags set according to the new PS value
 
-Description:
-The current values of PS and PC are pushed on the stack and the value
-at location (8 * src) replaces the PC while the value at location (8 *
-src + 4) replaces the PS. The source operand is an unsigned Byte.
-
 Exceptions:
   * none
 
+
 #### WAIT - WAIT
+This instruction causes the processor to idle until it receives an
+interrupt.
+
 Opcode:
 ```
   DB     WAIT       WAIT
@@ -2088,14 +2092,14 @@ Operation:
 Flags:
   * no changes
 
-Description:
-This instruction causes the processor to idle until it receives an
-interrupt.
-
 Exceptions:
   * none
 
+
 #### XOR - EXCLUSIVE OR
+The destination is set to the exclusive or of the source and the operand
+at the destination location.
+
 Opcodes:
 ```
   61     XOBR       eXclusive OR Byte
@@ -2115,11 +2119,7 @@ Flags:
   * N ← des < 0
   * Z ← des = 0
   * V ← 0
-  * U ← 0
-
-Description:
-The destination is set to the exclusive or of the source and the operand
-at the destination location.
+  * `U` ← 0
 
 Exceptions:
   * none
