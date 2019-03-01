@@ -7,12 +7,15 @@ in this early parallel computer.
 Due to the length of the document it has been split into these
 sections:
 
+## Overview
 * [Patent abstract and background](abstract.md)
+
 ## Part 1
 * [System overview](overview.md) (Sections 1-3)
 * [The Processor](processor.md) (Section 4, except 4.7 and 4.8)
 * [Instruction set](instructions.md) (Section 4.7 and 4.8)
 * [The Software and System Management](software.md) (Section 5-6)
 * [Using the System](use.md) (Section 7)
+
 ## Part 2
-* [Data Processor Implementation](claims.md) (Section 8 and claims)
+* [Data Processor Implementation](implementation.md) (Section 8 and claims)
