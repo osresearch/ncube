@@ -182,6 +182,8 @@ value is added to the PC; for Register Direct mode the register contents
 are added to the PC; for all other modes the address of the operand
 simply replaces the PC.
 
+----
+
 ```
 LITERAL 00xxxxxx (Mode=0,1,2,3)
 ```
@@ -198,10 +200,11 @@ literal is added to the PC (i.e. a relative Branch or Call results). If
 a literal (or immediate) is used as a destination an Operand Error is
 signaled.
 
+----
+
 ```
 Register Direct | C Rn |
 ```
-
 
 In this mode the operand is contained in the indicated register. The
 value is interpreted according to the instruction: real for floating
@@ -210,12 +213,16 @@ logical instructions. If a longreal operand is expected the low order
 part is in Rn and the high order part in Rn+1. When a byte or halfword is
 moved to a register it is sign-extended.
 
+----
+
 ```
 Register Indirect  | 4 Rn |
 ```
 
 The indicated register contains the address of the low order byte of
 the operand.
+
+----
 
 ```
 Autodecrement  | D Rn |
@@ -226,6 +233,8 @@ operand and then the contents becomes the address of the operand. This
 mode can be used to build a software stack or to access consecutive array
 elements.
 
+----
+
 ```
 Autoincrement   | 6 Rn |
 ```
@@ -234,6 +243,8 @@ The data addressed by Rn is first accessed and then Rn is incremented
 by the number of bytes in the operand. This mode is used to step through
 arrays and, with Autodecrement, to build software stacks.
 
+----
+
 ```
 Autoincrement Indirect | 7 Rn |
 ```
@@ -241,6 +252,8 @@ Autoincrement Indirect | 7 Rn |
 The register Rn points to a 32 bit value that is the address of the
 operand. After the operand is accessed Rn is incremented by four, since
 addresses are four bytes long.
+
+----
 
 ```
 Autoskip   | 5 Rn |
@@ -252,6 +265,8 @@ for automatically skipping through an array by an amount (in Rn+1) that
 can be calculated during program execution. For example if a matrix is
 stored by columns this mode permits automatic references to successive
 row elements.
+
+----
 
 ```
 Offset + Register  | 8,9,A Rn |
@@ -266,6 +281,8 @@ follows the mode indicator and is sign- extended for the effective
 address calculation. These modes are also available for the PC and SP
 in place of a general register (see below).
 
+----
+
 ```
 (Offset + Register) Indirect   | B Rn |
 Word offset
@@ -275,6 +292,8 @@ The contents of Rn are added to the offset (in this mode only a 32 bit
 offset is allowed) and the 32 bit value at that address is the address
 of the operand. This mode is also available with either PC or SP instead
 of a general register (see below).
+
+----
 
 ```
 Offset + PC  | F 0,1,2 |
@@ -289,6 +308,8 @@ branch instructions to jump relative to PC. (The Literal mode with branch
 instructions also is relative to PC.) This permits compiling position
 independent code.
 
+----
+
 ```
 (Offset + PC) Indirect   | F 3 | ????
 Word offset
@@ -297,6 +318,8 @@ Word offset
 The address of the instruction (the contents of PC) is added to the
 word offset and the 32 bit value at that address is the address to the
 operand.
+
+----
 
 ```
 Offset + SP  | F 4,5,6 |
@@ -308,6 +331,8 @@ offset. The offset can be a byte, halfword, or word. This mode is
 often used to access local variables in an activation record on the
 stack.
 
+----
+
 ```
 (Offset + SP) Indirect   | F 7 | Word offset
 ```
@@ -315,6 +340,7 @@ stack.
 The SP and the word offset are added together and the 32 bit value at
 that address is the address of the operand.
 
+----
 
 ```
 Direct  | F 8,9,A |
@@ -324,6 +350,7 @@ Direct  | F 8,9,A |
 The address is the unsigned value of the offset (byte, halfword or word
 depending on the mode) that follows the mode specifier.
 
+----
 
 ```
 Indirect  | F B | Word offset
@@ -331,6 +358,7 @@ Indirect  | F B | Word offset
 
 The word that follows the mode specifier points to a 32 bit value that is the address of the operand.
 
+----
 
 ```
 Immediate   | F C | Value
@@ -345,6 +373,8 @@ move address instruction causes an invalid operand fault. If this mode is
 used as the destination (the second address in a two address instruction)
 an Operand error is signaled.
 
+----
+
 ```
 Push Pop   | F D |
 ```
@@ -353,12 +383,16 @@ When this mode is the first specifier it takes the operand from the
 top of the stack and the increments ("pops") SP by the length of the
 operand. So the instruction
 
+----
+
 ```
 ADDR SP,mem
 ```
 
 will use a 32 bit real value from the top of the stack as the first
 operand, pop the stack and store the result as "mem". Similarly a
+
+----
 
 ```
 MOVH SP,mem
@@ -368,6 +402,8 @@ will move the halfword on the top of the stack to "mem" and pop the
 stack. When used as the second specifier, the second operand and
 the result come from the stack top. Thus with arithmetic and logical
 instructions there is no change in SP. However,
+
+----
 
 ```
 MOVR mem,SP
@@ -381,7 +417,6 @@ back on the stack. In the case of Divide and Subtract the operand at the
 top of the stack is the dividend and subtrahend respectively. If both
 specifiers are SP for a Move instruction, only the flags are affected.
 
-* [Instruction set](instructions.md) (Section 4.8)
 ## 4.8 Instruction Set
 
 ### 4.8.1 Instruction Set Details
@@ -416,24 +451,24 @@ The unique exception conditions for each instruction are included in the
 information below. There are a set of exceptions that are independent
 of the particular instruction:
 
-* (1) Memory error (ECC or Correctable ECC)
-* (2) Timeout
-* (3) Operand error (reserved addressing mode,literal or immediates the
+1. Memory error (ECC or Correctable ECC)
+2. Timeout
+3. Operand error (reserved addressing mode,literal or immediates the
 destination)
-* (4) Address error (address value greater than 2^17-1)
-* (5) Stack overflow
+4. Address error (address value greater than 2^17-1)
+5. Stack overflow
 
 The result stored at the destination of a floating point instruction is
 described below. The result is stored before the exception is signaled
 by an interrupt (except for Zero Divide and Invalid).
 
-* (1) Inexact: the correctly rounded result
-* (2) Underflow: the correctly rounded fraction but with the exponent
+1. Inexact: the correctly rounded result
+2. Underflow: the correctly rounded fraction but with the exponent
 increased by the bias
-* (3) Zero Divide: no result is stored; the destination is not changed
-* (4) Overflow: the correctly rounded fraction but with the exponent
+3. Zero Divide: no result is stored; the destination is not changed
+4. Overflow: the correctly rounded fraction but with the exponent
 decreased by the bias
-* (5) Invalid: no result is stored; the destination is not changed.
+5. Invalid: no result is stored; the destination is not changed.
 
 It is important to remember that the Negative (N) Flag is always set
 according to the sign of the correct result. Thus on integer overflow,
@@ -469,6 +504,7 @@ Flags:
 Exceptions:
   * Integer overflow
 
+----
 
 #### ADCD - ADD WITH CARRY DECIMAL
 The Carry and source value (treated as a two decimal value) are added to
@@ -497,6 +533,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### ADD - ADD
 The source is added to the destination and the result is stored at the
@@ -545,6 +583,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### AND - AND
 The destination operand is anded with the source and the result is stored
 at the destination address.
@@ -573,6 +613,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### B - Branch
 The Branch instructions are relative in the literal immediate
@@ -626,6 +668,8 @@ Exceptions:
   * Illegal Address (Immediate mode)
 
 
+----
+
 #### BCNT - BROADCAST COUNT
 The Output Count registers whose numbers correspond to bit positions in
 des that are set to one are loaded with the src value. The Output
@@ -651,6 +695,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### BIT - BIT TEST
 The Z Flag is set to 0 if all the bits of src that are masked by dsrc
@@ -681,6 +727,8 @@ Exceptions:
   * none
 
 
+----
+
 #### BKPT - BREAKPOINT
 This one byte instruction is used by a debugger to set breakpoints
 in a user's program.
@@ -708,6 +756,10 @@ Exceptions:
   * none
 
 
+----
+
+----
+
 #### BPTR - BROADCAST POINTER
 The Output Registers whose numbers correspond with the bit positions
 in des that are set are loaded with the src. This instruction sets
@@ -734,6 +786,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### CALL - CALL
 The current value of the Program Counter (PC) is pushed on the stack
@@ -773,6 +827,8 @@ Exceptions:
   * Illegal Address (Immediate mode)
 
 
+----
+
 #### CLC - CLEAR CARRY
 The Carry Flag is set to zero.
 
@@ -795,6 +851,8 @@ Exceptions:
   * none
 
 
+----
+
 #### CMC - COMPLEMENT CARRY
 The Carry Flag is reversed.
 
@@ -816,6 +874,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### CMP - COMPARE
 The value src is compared to dsrc and the appropriate flags are set for
@@ -863,6 +923,8 @@ Flags:  (Floating Point Operations: CMPR,CMPL)
 Exceptions:
   * none
 
+
+----
 
 #### CV - CONVERT
 The source operand is converted to the type and length indicated by the
@@ -912,6 +974,8 @@ Exceptions:
   * Invalid [CVRL,CVLR]
 
 
+----
+
 #### DI - DISABLE INTERRUPTS
 The Interrupt Enable (IE) flag in the Program Status register is set to
 zero. This disables all interrupts that can be disabled.
@@ -934,6 +998,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### DIV - DIVIDE
 The destination is divided by the source and the result is stored at
@@ -984,6 +1050,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### DVR - DIVIDE REVERSE
 The source operand is divided by the destination operand and the result
 is stored at the address of the destination.
@@ -1032,6 +1100,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### EI - ENABLE INTERRUPTS
 The Interrupt Enable (IE) flag in the Program Status register is set to
 one. This enables all interrupts that have not been otherwise disabled.
@@ -1054,6 +1124,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### ER - ERROR
 Error on and off are used to set a pin level in order to indicate a
@@ -1079,6 +1151,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### FFO - FIND FIRST ONE
 If the source is zero the destination is set to 8 (FFOB), 16 (FFOH) or
@@ -1113,6 +1187,8 @@ Exceptions:
   * none
 
 
+----
+
 #### LCNT - LOAD COUNT
 The I/O Count Register designated by the destination is loaded with the
 source operand, The Input Registers are numbered 0,1,. . .,9,31 and
@@ -1140,6 +1216,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### LDPR - LOAD PROCESSOR REGISTERS
 The source value is loaded into the Processor Register designated
@@ -1181,6 +1259,8 @@ Exceptions:
   * none
 
 
+----
+
 #### LPTR - LOAD POINTER
 The I/O Address Register designated by the destination is loaded with
 the source operand. The Input Registers are numbered 0,1,. . .,9,31 and
@@ -1207,6 +1287,8 @@ Exceptions:
   * none
 
 
+----
+
 #### MOV - MOVE
 The source value is moved to the destination address.
 
@@ -1232,6 +1314,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### MOVA - MOVE ADDRESS
 The address specifier of the source operand is evaluated and stored at
@@ -1262,6 +1346,8 @@ Flags:
 Exceptions:
   * Illegal Address
 
+
+----
 
 #### MUL - MULTIPLY
 The source and destination are multiplied and the result is stored
@@ -1313,6 +1399,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### NEG - NEGATE
 The source operand is negated and the result is stored at the address
 of the destination. Integer overflow occurs when the source is the
@@ -1358,6 +1446,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### NOP - NO OPERATION
 This instruction does nothing.
 
@@ -1379,6 +1469,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### NOT - NOT
 The source is complemented and the result is stored at the destination
@@ -1409,6 +1501,8 @@ Exceptions:
   * none
 
 
+----
+
 #### OR - OR
 The destination and source are "ored" together and the result is stored
 at the address of the destination.
@@ -1437,6 +1531,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### REM - REMAINDER
 The remainder of the destination divided by the source replaces the
@@ -1485,6 +1581,8 @@ Exceptions:
   * Underflow
   * Invalid
 
+
+----
 
 #### REP - REPEAT
 A REPeat instruction may precede and other instruction. It causes bits
@@ -1555,6 +1653,8 @@ Exceptions:
   * address
 
 
+----
+
 #### RET - RETURN
 The contents of the stack top (assumed to be a return address) are popped
 into the Program Counter.
@@ -1577,6 +1677,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### RETI - RETURN FROM INTERRUPT
 The top of stack (assumed to contain the PC in effect before the current
@@ -1603,6 +1705,8 @@ Exceptions:
   * none
 
 
+----
+
 #### RETP - RETURN AND POP
 The top of stack is popped into the Program Counter and then the source
 (Word) value is added to the Stack Pointer in order to pop a set of
@@ -1627,6 +1731,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### ROT - ROTATE
 If the source is zero the destination is not changed but the Carry
@@ -1662,6 +1768,8 @@ Exceptions:
   * none
 
 
+----
+
 #### RSET - RESET
 RSET causes the Integer and Floating point Execution units to be
 initialized and all pending interrupts to be reset. All I/O activity
@@ -1686,6 +1794,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### SBB - SUBTRACT WITH BORROW
 The Carry (borrow) and source values are subtracted from the destination
@@ -1716,6 +1826,8 @@ Exceptions:
   * Integer overflow
 
 
+----
+
 #### SBBD - SUBTRACT DECIMAL
 The Carry value (borrow) and source (Byte) value treated as a two
 BCD digit value are subtracted from the destination considered
@@ -1744,6 +1856,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### SBR - SUBTRACT REVERSE
 The destination value is subtracted from the source and the result
@@ -1792,6 +1906,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### SFA - SHIFT ARITHMETIC
 If the source is zero the destination is unchanged and the Carry flag
 is set to the least significant bit of the destination. Otherwise,
@@ -1832,6 +1948,8 @@ Exceptions:
   * Integer overflow
 
 
+----
+
 #### SFT - SHIFT LOGICAL
 If the source is zero the destination is unchanged and the Carry flag
 is set to the least significant bit of the destination. Otherwise, the
@@ -1870,6 +1988,8 @@ Exceptions:
   * none
 
 
+----
+
 #### SGN - SET SIGN
 The sign of the destination is set to the sign of the source.
 
@@ -1901,6 +2021,8 @@ Flags:
 Exceptions:
   * Invalid
 
+
+----
 
 #### SQT - SQUARE ROOT
 The square root of the source replaces the destination. The square root
@@ -1936,6 +2058,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### STC - SET CARRY
 The Carry flag is set to one.
 
@@ -1957,6 +2081,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### STPR - STORE PROCESSOR REGISTERS
 The contents of the Processor Register whose number corresponds with
@@ -2000,6 +2126,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### SUB - SUBTRACT
 The source is subtracted from the destination and the result is stored
@@ -2048,6 +2176,8 @@ Exceptions:
   * Invalid
 
 
+----
+
 #### TRAP - TRAP
 The current values of PS and PC are pushed on the stack and the value
 at location (8 * src) replaces the PC while the value at location (8 *
@@ -2076,6 +2206,8 @@ Exceptions:
   * none
 
 
+----
+
 #### WAIT - WAIT
 This instruction causes the processor to idle until it receives an
 interrupt.
@@ -2098,6 +2230,8 @@ Flags:
 Exceptions:
   * none
 
+
+----
 
 #### XOR - EXCLUSIVE OR
 The destination is set to the exclusive or of the source and the operand
