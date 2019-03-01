@@ -1,3 +1,5 @@
+[Up](/)
+
 # 4. THE PROCESSOR
 
 ## 4.1 Introduction

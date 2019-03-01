@@ -1,3 +1,5 @@
+[Up](/)
+
 ## 4.7 Instruction Formats and Addressing Modes
 
 The processor is designed to be as simple and symmetric as possible. Most
@@ -705,7 +707,15 @@ Flags:
 Exceptions:
   * none
 
+
 #### BPTR - BROADCAST POINTER
+The Output Registers whose numbers correspond with the bit positions
+in des that are set are loaded with the src. This instruction sets
+up a group of Output Pointer registers to address a memory area
+containing a message to be broadcast. The Pointer registers should
+be set up before the Count registers (BCNT) are loaded. Both src
+and des are Word values.
+
 Opcode:
 ```
  D5      BPTR       Broadcast PoinTeR
@@ -720,13 +730,6 @@ Operation:
 ```
 Flags:
   * no changes
-Description:
-   The Output Registers whose numbers correspond with the bit positions
-   in des that are set are loaded with the src. This instruction sets
-   up a group of Output Pointer registers to address a memory area
-   containing a message to be broadcast. The Pointer registers should
-   be set up before the Count registers (BCNT) are loaded. Both src
-   and des are Word values.
 
 Exceptions:
   * none
