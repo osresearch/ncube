@@ -102,22 +102,21 @@ and is repeated twice.
 The Opcode Map illustrates a number of symmetries that are explained in
 the table below.
 
-```
-                          OPERANDS
-OPERATIONS                (#, TYPE)              COLUMNS
-Special                   0                      11
-Special                   1, Byte or Halfword    14
-Branch                    1, Word (Address)      15
-Conversion                2, Mixed               9
-Byte                      2, Byte                0,1
-Halfword                  2, Halfword            2,3
-Word                      2, Word                4,5
-Reserved for Double word  *,*                    6,7
-Real                      2, Real                8
-Longreal                  2, Longreal            10
-Reserved for Tempreal     *,*                    12
-Reserved (Arbitrary)      *,*                    13
-```
+ OPERATIONS              | OPERANDS (#, TYPE)    |  COLUMNS
+-------------------------|-----------------------|-----------
+Special                  |  0                    | 11
+Special                  |  1, Byte or Halfword  | 14
+Branch                   |  1, Word (Address)    | 15
+Conversion               |  2, Mixed             | 9
+Byte                     |  2, Byte              | 0,1
+Halfword                 |  2, Halfword          | 2,3
+Word                     |  2, Word              | 4,5
+Reserved for Double word |  *,*                  | 6,7
+Real                     |  2, Real              | 8
+Longreal                 |  2, Longreal          | 10
+Reserved for Tempreal    |  *,*                  | 12
+Reserved (Arbitrary)     |  *,*                  | 13
+
 
 ### 4.7.2 Addressing Modes
 
@@ -132,43 +131,44 @@ TODO: figure
 The modes are listed below with their encodings and mnenomics.
 
 #### Addressing Mode Table
-| Mode | Name | Encoding | Mnemonic |
-|------|------|----------|----------|
-| Literal                          | 0,1,2,3 |  literal | #n |
-| Register Direct                  | C     | Rn  |  Rn |
-| Register Indirect                | 4     | Rn  |  (Rn) |
-| Autodecrement                    | D     | Rn  |  -(Rn) |
-| Autoincrement                    | 6     | Rn  |  (Rn)+ |
-| Autoincrement Indirect           | 7     | Rn  |  @(Rn)+ |
-| Autoskip                         | 5     | Rn  |  (Rn)++ |
-| Offset+Register Indirect | | |
-| - Byte Offset                    | 8     | Rn  |  A(Rn) |
-| - Halfword Offset                | 9     | Rn  |  A(Rn) |
-| - Word Offset                    | A     | Rn  |  A(Rn) |
-| - (Word Offset+Register) Indirect| B     | Rn  |  @A(Rn) |
-| RESERVED                         | E     |     | |
+
+ Mode                             | Name    | Encoding | Mnemonic 
+----------------------------------|---------|-------- -|--------
+Literal                           | 0,1,2,3 | literal  |  `#n`
+Register Direct                   | C       | Rn       |  `Rn`
+Register Indirect                 | 4       | Rn       |  `(Rn)`
+Autodecrement                     | D       | Rn       |  `-(Rn)`
+Autoincrement                     | 6       | Rn       |  `(Rn)+`
+Autoincrement Indirect            | 7       | Rn       |  `@(Rn)+`
+Autoskip                          | 5       | Rn       |  `(Rn)++`
+*Offset+Register Indirect*        |         |          |
+ - Byte Offset                    | 8       | Rn       |  `A(Rn)`
+ - Halfword Offset                | 9       | Rn       |  `A(Rn)`
+ - Word Offset                    | A       | Rn       |  `A(Rn)`
+ - (Word Offset+Register) Indirect| B       | Rn       |  `@A(Rn)`
+RESERVED                          | E       |          |
 
 #### Special Modes: no General Register
 
-| Mode | Name | Encoding | Mnemonic |
-|------|------|----------|----------|
-| Offset+PC | | |
-| -  Byte Offset+PC                |  F  |    0  |   S(PC) |
-| -  Halfword Offset+PC            |  F  |    1  |   A(PC) |
-| -  Word Offset+PC                |  F  |    2  |   S(PC) |
-| -  (Word Offset+PC)Indirect      |  F  |    3  |   @A(PC) |
-| -  Offset+SP Byte Offset+SP      |  F  |    4  |   S(SP) |
-| -  Halfword Offset+SP            |  F  |    5  |   S(SP) |
-| -  Word Offset+SP                |  F  |    6  |   A(SP) |
-| -  (Word Offset+SP)Indirect      |  F  |    7  |   @A(SP) |
-| -  Direct Byte Offset            |  F  |    8  |   A |
-| -  Halfword Offset               |  F  |    9  |   A |
-| -  Word Offset                   |  F  |    A  |   A |
-| (Word)Indirect                   | F   |   B   |  @A |
-| Push/Pop                         | F   |   `C` |    STK |
-| Immediate                        | F   |   D   |  #n |
-| RESERVED                         | F   |   E   | |
-| ESCAPE                           | F   |   F   | |
+ Mode                            | Name | Encoding | Mnemonic |
+---------------------------------|------|----------|----------|
+*Offset+PC*                      |      |      |
+ -  Byte Offset+PC               | F    |   0  |   `S(PC)`
+ -  Halfword Offset+PC           | F    |   1  |   `A(PC)`
+ -  Word Offset+PC               | F    |   2  |   `S(PC)`
+ -  (Word Offset+PC)Indirect     | F    |   3  |   `@A(PC)`
+ -  Offset+SP Byte Offset+SP     | F    |   4  |   `S(SP)`
+ -  Halfword Offset+SP           | F    |   5  |   `S(SP)`
+ -  Word Offset+SP               | F    |   6  |   `A(SP)`
+ -  (Word Offset+SP)Indirect     | F    |   7  |   `@A(SP)`
+ -  Direct Byte Offset           | F    |   8  |   `A`
+ -  Halfword Offset              | F    |   9  |   `A`
+ -  Word Offset                  | F    |   A  |   `A`
+(Word)Indirect                   | F    |   B  |  `@A`
+Push/Pop                         | F    |   C  |  `STK`
+Immediate                        | F    |   D  |  `#n`
+RESERVED                         | F    |   E  | 
+ESCAPE                           | F    |   F  | 
 
 The assembler will chose the shortest reference form possible. The
 addressing modes are described in detail below. First note the following:
