@@ -2,4 +2,3 @@ theme: jekyll-theme-minimal
 title: [nCube systems]
 description: [Documentation on the nCube parallel hypercube supercomputer]
 logo: [images/logo.jpg]
-show_downloads: ["false"]
