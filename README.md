@@ -2,18 +2,17 @@ This is a re-typeset version of the nCube patent, US5113523A.
 It is an entire architectural reference manual for the custom CPU
 in this early parallel computer.
 
-<a href="images/patent.jpg"><img src="images/patent.png" width="320px" /></a>
-
 Due to the length of the document it has been split into these
 sections:
 
 
 ## Overview
+<a href="images/patent.jpg"><img src="images/patent.png" width="320px" /></a>
 * [Patent abstract and background](abstract.md)
 
-![ncube CPU array](images/ncube-cpu.jpg)
 
 ## Part 1
+![ncube CPU array](images/ncube-cpu.jpg)
 * [System overview](overview.md) (Sections 1-3)
 * [The Processor](processor.md) (Section 4, except 4.7 and 4.8)
 * [Instruction set](instructions.md) (Section 4.7 and 4.8)
