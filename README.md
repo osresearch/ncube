@@ -4,7 +4,7 @@ This is a re-typeset version of the nCube patent, US5113523A.
 It is an entire architectural reference manual for the custom CPU
 in this early parallel computer.
 
-<a href="images/patent.jpg"><img src="images/patent.png" width=320/></a>
+<a href="images/patent.jpg"><img src="images/patent.png" width="320px" /></a>
 
 Due to the length of the document it has been split into these
 sections:
