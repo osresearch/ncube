@@ -1,5 +1,3 @@
-![ncube CPU array](images/ncube-cpu.jpg)
-
 This is a re-typeset version of the nCube patent, US5113523A.
 It is an entire architectural reference manual for the custom CPU
 in this early parallel computer.
@@ -9,8 +7,11 @@ in this early parallel computer.
 Due to the length of the document it has been split into these
 sections:
 
+
 ## Overview
 * [Patent abstract and background](abstract.md)
+
+![ncube CPU array](images/ncube-cpu.jpg)
 
 ## Part 1
 * [System overview](overview.md) (Sections 1-3)
@@ -27,5 +28,3 @@ sections:
 
 * https://www.flickr.com/photos/osr/albums/72157703742799362
 
-
-![logo](images/logo.jpg)
