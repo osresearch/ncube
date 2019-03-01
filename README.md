@@ -15,4 +15,4 @@ sections:
 * [The Software and System Management](software.md) (Section 5-6)
 * [Using the System](use.md) (Section 7)
 ## Part 2
-* [Data Processing Implementation](claims.md) (Section 8 and claims)
+* [Data Processor Implementation](claims.md) (Section 8 and claims)
