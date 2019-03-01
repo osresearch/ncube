@@ -26,3 +26,6 @@ sections:
 ## Photos
 
 * https://www.flickr.com/photos/osr/albums/72157703742799362
+
+
+![logo](images/logo.jpg)
