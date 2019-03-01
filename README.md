@@ -4,7 +4,7 @@ This is a re-typeset version of the nCube patent, US5113523A.
 It is an entire architectural reference manual for the custom CPU
 in this early parallel computer.
 
-![Patent cover image](images/patent.png | width=320)
+<a href="images/patent.jpg"><img src="images/patent.png" width=320/></a>
 
 Due to the length of the document it has been split into these
 sections:
@@ -21,6 +21,8 @@ sections:
 
 ## Part 2
 * [Data Processor Implementation](implementation.md) (Section 8.1 - 8.11)
-* [Patent Claims and Citatoins](claims.md) (Section 8.12, Claims and Citations)
+* [Patent Claims and Citations](claims.md) (Section 8.12, Claims and Citations)
 
-##
+## Photos
+
+* https://www.flickr.com/photos/osr/albums/72157703742799362
