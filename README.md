@@ -12,7 +12,7 @@ sections:
 
 
 ## Part 1
-<a href="images/ncube-cpu.jpg"><img src="images/ncube-cpu.png" width="480px" alt="nCUBE CPU array" /></a>
+<a href="images/ncube-cpu.jpg"><img src="images/ncube-cpu.jpg" width="480px" alt="nCUBE CPU array" /></a>
 * [System overview](overview.md) (Sections 1-3)
 * [The Processor](processor.md) (Section 4, except 4.7 and 4.8)
 * [Instruction set](instructions.md) (Section 4.7 and 4.8)
