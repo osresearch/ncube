@@ -20,10 +20,11 @@ sections:
 * [Using the System](use.md) (Section 7)
 
 ## Part 2
+<a href="images/fig-14.jpg"><img src="images/fig-14.png" width="480px" /></a>
 * [Data Processor Implementation](implementation.md) (Section 8.1 - 8.11)
 * [Patent Claims and Citations](claims.md) (Section 8.12, Claims and Citations)
 
-## Photos
-
-* https://www.flickr.com/photos/osr/albums/72157703742799362
+## External links
+* [More photos](https://www.flickr.com/photos/osr/albums/72157703742799362)
+* [nCUBE on wikipedia](https://en.wikipedia.org/wiki/NCUBE)
 
