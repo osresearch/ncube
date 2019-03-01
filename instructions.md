@@ -131,42 +131,44 @@ TODO: figure
 
 The modes are listed below with their encodings and mnenomics.
 
-```
-Addressing Mode Table
-Mode Name                          Encoding   Mnemonic
-Literal                            0,1,2,3 literal #n
-Register Direct                    C       Rn     Rn
-Register Indirect                  4       Rn     (Rn)
-Autodecrement                      D       Rn     -(Rn)
-Autoincrement                      6       Rn     (Rn)+
-Autoincrement Indirect             7       Rn     @(Rn)+
-Autoskip                           5       Rn     (Rn)++
-Offset+Register Indirect
-  Byte Offset                      8       Rn     A(Rn)
-  Halfword Offset                  9       Rn     A(Rn)
-  Word Offset                      A       Rn     A(Rn)
-  (Word Offset+Register) Indirect  B       Rn     @A(Rn)
-RESERVED                           E
+#### Addressing Mode Table
+| Mode | Name | Encoding | Mnemonic |
+|------|------|----------|----------|
+| Literal                          | 0,1,2,3 |  literal | #n |
+| Register Direct                  | C     | Rn  |  Rn |
+| Register Indirect                | 4     | Rn  |  (Rn) |
+| Autodecrement                    | D     | Rn  |  -(Rn) |
+| Autoincrement                    | 6     | Rn  |  (Rn)+ |
+| Autoincrement Indirect           | 7     | Rn  |  @(Rn)+ |
+| Autoskip                         | 5     | Rn  |  (Rn)++ |
+| Offset+Register Indirect | | |
+| - Byte Offset                    | 8     | Rn  |  A(Rn) |
+| - Halfword Offset                | 9     | Rn  |  A(Rn) |
+| - Word Offset                    | A     | Rn  |  A(Rn) |
+| - (Word Offset+Register) Indirect| B     | Rn  |  @A(Rn) |
+| RESERVED                         | E     |     | |
 
-Special Modes: no General Register
-Offset+PC
-  Byte Offset+PC                   F       0      S(PC)
-  Halfword Offset+PC               F       1      A(PC)
-  Word Offset+PC                   F       2      S(PC)
-  (Word Offset+PC)Indirect         F       3      @A(PC)
-  Offset+SP Byte Offset+SP         F       4      S(SP)
-  Halfword Offset+SP               F       5      S(SP)
-  Word Offset+SP                   F       6      A(SP)
-  (Word Offset+SP)Indirect         F       7      @A(SP)
-  Direct Byte Offset               F       8      A
-  Halfword Offset                  F       9      A
-  Word Offset                      F       A      A
-(Word)Indirect                     F       B      @A
-Push/Pop                           F       C      STK
-Immediate                          F       D      #n
-RESERVED                           F       E
-ESCAPE                             F       F
-```
+#### Special Modes: no General Register
+
+| Mode | Name | Encoding | Mnemonic |
+|------|------|----------|----------|
+| Offset+PC | | |
+| -  Byte Offset+PC                |  F  |    0  |   S(PC) |
+| -  Halfword Offset+PC            |  F  |    1  |   A(PC) |
+| -  Word Offset+PC                |  F  |    2  |   S(PC) |
+| -  (Word Offset+PC)Indirect      |  F  |    3  |   @A(PC) |
+| -  Offset+SP Byte Offset+SP      |  F  |    4  |   S(SP) |
+| -  Halfword Offset+SP            |  F  |    5  |   S(SP) |
+| -  Word Offset+SP                |  F  |    6  |   A(SP) |
+| -  (Word Offset+SP)Indirect      |  F  |    7  |   @A(SP) |
+| -  Direct Byte Offset            |  F  |    8  |   A |
+| -  Halfword Offset               |  F  |    9  |   A |
+| -  Word Offset                   |  F  |    A  |   A |
+| (Word)Indirect                   | F   |   B   |  @A |
+| Push/Pop                         | F   |   `C` |    STK |
+| Immediate                        | F   |   D   |  #n |
+| RESERVED                         | F   |   E   | |
+| ESCAPE                           | F   |   F   | |
 
 The assembler will chose the shortest reference form possible. The
 addressing modes are described in detail below. First note the following:
@@ -182,10 +184,10 @@ value is added to the PC; for Register Direct mode the register contents
 are added to the PC; for all other modes the address of the operand
 simply replaces the PC.
 
-----
 
+#### LITERAL
 ```
-LITERAL 00xxxxxx (Mode=0,1,2,3)
+00xxxxxx (Mode=0,1,2,3)
 ```
 
 Since the encoding for literal includes modes 0,1,2,3, there are six
@@ -200,10 +202,10 @@ literal is added to the PC (i.e. a relative Branch or Call results). If
 a literal (or immediate) is used as a destination an Operand Error is
 signaled.
 
-----
 
+#### Register Direct
 ```
-Register Direct | C Rn |
+| `C` Rn |
 ```
 
 In this mode the operand is contained in the indicated register. The
@@ -213,19 +215,19 @@ logical instructions. If a longreal operand is expected the low order
 part is in Rn and the high order part in Rn+1. When a byte or halfword is
 moved to a register it is sign-extended.
 
-----
 
+#### Register Indirect
 ```
-Register Indirect  | 4 Rn |
+| 4 Rn |
 ```
 
 The indicated register contains the address of the low order byte of
 the operand.
 
-----
 
+#### Autodecrement
 ```
-Autodecrement  | D Rn |
+| D Rn |
 ```
 
 The indicated register is decremented by the length in bytes of the
@@ -233,30 +235,30 @@ operand and then the contents becomes the address of the operand. This
 mode can be used to build a software stack or to access consecutive array
 elements.
 
-----
 
+#### Autoincrement
 ```
-Autoincrement   | 6 Rn |
+| 6 Rn |
 ```
 
 The data addressed by Rn is first accessed and then Rn is incremented
 by the number of bytes in the operand. This mode is used to step through
 arrays and, with Autodecrement, to build software stacks.
 
-----
 
+#### Autoincrement Indirect
 ```
-Autoincrement Indirect | 7 Rn |
+| 7 Rn |
 ```
 
 The register Rn points to a 32 bit value that is the address of the
 operand. After the operand is accessed Rn is incremented by four, since
 addresses are four bytes long.
 
-----
 
+#### Autoskip
 ```
-Autoskip   | 5 Rn |
+| 5 Rn |
 ```
 
 After the operand addressed by the contents of Rn is fetched, the
@@ -266,52 +268,50 @@ can be calculated during program execution. For example if a matrix is
 stored by columns this mode permits automatic references to successive
 row elements.
 
-----
 
+#### Offset + Register
 ```
-Offset + Register  | 8,9,A Rn |
-A = byte, B = halfword, C = word
+| 8,9,A Rn |
+8 = byte, 9 = halfword, A = word
 ```
-
 
 This mode calculates the address of the operand by adding the value in
 Rn to the offset which is a signed integer whose length is determined by
 the mode setting (A=byte, B=halfword, C=word). The offset immediately
 follows the mode indicator and is sign- extended for the effective
-address calculation. These modes are also available for the PC and SP
+address calculation. These modes are also available for the `PC` and SP
 in place of a general register (see below).
 
-----
 
+#### (Offset + Register) Indirect
 ```
-(Offset + Register) Indirect   | B Rn |
-Word offset
+| B Rn | Word offset
 ```
 
 The contents of Rn are added to the offset (in this mode only a 32 bit
 offset is allowed) and the 32 bit value at that address is the address
-of the operand. This mode is also available with either PC or SP instead
+of the operand. This mode is also available with either `PC` or `SP` instead
 of a general register (see below).
 
-----
 
+#### Offset + PC
 ```
-Offset + PC  | F 0,1,2 |
+| F 0,1,2 |
 0 = byte, 1 = halfword, 2 = word
 ```
 
 The address is calculated by adding the address of the instruction
-(the value of PC before the current instruction is executed) to
+(the value of `PC` before the current instruction is executed) to
 the sign-extended value of the offset which can be a byte, halfword
-or word. This mode is used to access operands relative to PC and with
+or word. This mode is used to access operands relative to `PC` and with
 branch instructions to jump relative to PC. (The Literal mode with branch
 instructions also is relative to PC.) This permits compiling position
 independent code.
 
-----
 
+#### (Offset + PC) Indirect
 ```
-(Offset + PC) Indirect   | F 3 | ????
+| F 3 | ????
 Word offset
 ```
 
@@ -319,49 +319,49 @@ The address of the instruction (the contents of PC) is added to the
 word offset and the 32 bit value at that address is the address to the
 operand.
 
-----
 
+#### Offset + SP
 ```
-Offset + SP  | F 4,5,6 |
+| F 4,5,6 |
 4 = byte, 5 = halfword, 6 = word
 ```
 
-The address is calculated by adding the SP and the sign extended
+The address is calculated by adding the `SP` and the sign extended
 offset. The offset can be a byte, halfword, or word. This mode is
 often used to access local variables in an activation record on the
 stack.
 
-----
 
+#### (Offset + SP) Indirect
 ```
-(Offset + SP) Indirect   | F 7 | Word offset
+| F 7 | Word offset
 ```
 
-The SP and the word offset are added together and the 32 bit value at
+The `SP` and the word offset are added together and the 32 bit value at
 that address is the address of the operand.
 
-----
 
+#### Direct
 ```
-Direct  | F 8,9,A |
+| F 8,9,A |
 8 = byte, 9 = halfword, A = word
 ```
 
 The address is the unsigned value of the offset (byte, halfword or word
 depending on the mode) that follows the mode specifier.
 
-----
 
+#### Indirect
 ```
-Indirect  | F B | Word offset
+| F B | Word offset
 ```
 
 The word that follows the mode specifier points to a 32 bit value that is the address of the operand.
 
-----
 
+#### Immediate
 ```
-Immediate   | F C | Value
+| F C | Value
 ```
 
 In this mode the operand follows the mode specifier for arithmetic and
@@ -373,17 +373,15 @@ move address instruction causes an invalid operand fault. If this mode is
 used as the destination (the second address in a two address instruction)
 an Operand error is signaled.
 
-----
 
+#### Push Pop
 ```
-Push Pop   | F D |
+| F D |
 ```
 
 When this mode is the first specifier it takes the operand from the
-top of the stack and the increments ("pops") SP by the length of the
+top of the stack and the increments ("pops") `SP` by the length of the
 operand. So the instruction
-
-----
 
 ```
 ADDR SP,mem
@@ -391,8 +389,6 @@ ADDR SP,mem
 
 will use a 32 bit real value from the top of the stack as the first
 operand, pop the stack and store the result as "mem". Similarly a
-
-----
 
 ```
 MOVH SP,mem
@@ -403,19 +399,18 @@ stack. When used as the second specifier, the second operand and
 the result come from the stack top. Thus with arithmetic and logical
 instructions there is no change in SP. However,
 
-----
-
 ```
 MOVR mem,SP
 ```
 
-will decrement SP by four (the length of the operand) and move the real
+will decrement `SP` by four (the length of the operand) and move the real
 value at "mem" to the top of the stack. When this mode is used in both
 specifiers then the classical stack operations result: both operands are
 popped off the stack, the operation performed and the result is pushed
 back on the stack. In the case of Divide and Subtract the operand at the
 top of the stack is the dividend and subtrahend respectively. If both
-specifiers are SP for a Move instruction, only the flags are affected.
+specifiers are `SP` for a Move instruction, only the flags are affected.
+
 
 ## 4.8 Instruction Set
 
@@ -439,9 +434,9 @@ operations (e.g. autodecrement) are performed before the destination
 (dsrc, des) address is evaluated. (In the above notation "dsrc" refers
 to the operand before the operation is performed and "des" refers to the
 contents of that address after the operation.) This does not apply to
-stack addressing modes where the SP at the beginning of the instruction
-is always used. Any addressing mode that refers to the PC or (SP) uses
-the value of the PC (opr SP) at the beginning of the instruction. The
+stack addressing modes where the `SP` at the beginning of the instruction
+is always used. Any addressing mode that refers to the `PC` or (SP) uses
+the value of the `PC` (opr SP) at the beginning of the instruction. The
 source operand is never changed except when using the stack addressing
 mode. If an instruction with byte or halfword operands references a
 general register, the high order part of the data is ignored if it is
@@ -472,7 +467,7 @@ decreased by the bias
 
 It is important to remember that the Negative (N) Flag is always set
 according to the sign of the correct result. Thus on integer overflow,
-the destination may appear positive even when N indicates negative.
+the destination may appear positive even when `N` indicates negative.
 
 ### 4.8.2 Instruction Definitions
 
@@ -618,7 +613,7 @@ Exceptions:
 
 #### B - Branch
 The Branch instructions are relative in the literal immediate
-and register direct modes and use the value of the PC at the
+and register direct modes and use the value of the `PC` at the
 beginning of the instruction. In all other modes the address of
 the source operand replaces the PC. The Invalid exception results
 when comparison accesses at least one Nan and a signed branch is
@@ -658,13 +653,13 @@ Operation:
     Other Modes: PC ← address of (src)
 ```
 Flags:
-  * No flags are changed except `IN` (INvalid exception). IN is set
+  * No flags are changed except `IN` (INvalid exception). `IN` is set
   only when U=1 on BG, BGE, BL, BLE. The Repeat Mode (REP) is reset
   (REP ← 00) after decrementing the counter and checking the condition
   (see below).
 
 Exceptions:
-  * Invalid (BG,BGE,BL,BLE when U = 1);
+  * Invalid (BG,BGE,BL,BLE when `U` = 1);
   * Illegal Address (Immediate mode)
 
 
@@ -699,7 +694,7 @@ Exceptions:
 ----
 
 #### BIT - BIT TEST
-The Z Flag is set to 0 if all the bits of src that are masked by dsrc
+The `Z` Flag is set to 0 if all the bits of src that are masked by dsrc
 are 0. Neither src nor dsrc is changed.
 
 Opcodes:
@@ -717,10 +712,10 @@ Operation:
   src AND dsrc
 ```
 Flags:
-  * C ← C
-  * N ← (src AND dsrc) < 0
-  * Z ← (src AND dsrc) = 0
-  * V ← 0
+  * `C` ← C
+  * `N` ← (src AND dsrc) < 0
+  * `Z` ← (src AND dsrc) = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -790,8 +785,8 @@ Exceptions:
 ----
 
 #### CALL - CALL
-The current value of the Program Counter (PC) is pushed on the stack
-and by loading the PC with a new value a branch to a subroutine is
+The current value of the Program Counter (`PC`) is pushed on the stack
+and by loading the `PC` with a new value a branch to a subroutine is
 taken. If the CALL is preceded by a REPEAT instruction the counter is
 decremented and the termination condition is checked. The Repeat Mode is
 reset (REP ← 00) and if termination is not reached then the return
@@ -801,7 +796,7 @@ the processor to execute multiple CALLs. If there is no preceding
 REPEAT then the saved return address points to the beginning of the
 instruction following the CALL. If the addressing mode is Literal,
 Immediate or Register Direct the call is relative and uses the value
-of PC at the beginning of the CALL instruction.
+of `PC` at the beginning of the CALL instruction.
 
 Opcode:
 ```
@@ -842,10 +837,10 @@ AssemblerSyntax:
 ```
 Operation:
 ```
-  C ← 0
+  `C` ← 0
 ```
 Flags:
-  * C ← 0   no other changes
+  * `C` ← 0   no other changes
 
 Exceptions:
   * none
@@ -866,10 +861,10 @@ AssemblerSyntax:
 ```
 Operation:
 ```
-  C ← not(C)
+  `C` ← not(C)
 ```
 Flags:
-  * C ← not(C)   no other changes
+  * `C` ← not(C)   no other changes
 
 Exceptions:
   * none
@@ -902,23 +897,23 @@ Operation:
   src - dsrc → tem
 ```
 Flags:  (Integer Operations: CMPB,CMPH,CMPW)
-  * C ← src < (unsigned) dsrc
-  * N ← tem < 0
-  * Z ← tem = 0
-  * V ← 0
+  * `C` ← src < (unsigned) dsrc
+  * `N` ← tem < 0
+  * `Z` ← tem = 0
+  * `V` ← 0
   * `U` ← 0
 
 Flags:  (Floating Point Operations: CMPR,CMPL)
-  * C ← tem < 0
-  * N ← tem < 0
-  * Z ← tem = 0
-  * V ← 0
+  * `C` ← tem < 0
+  * `N` ← tem < 0
+  * `Z` ← tem = 0
+  * `V` ← 0
   * `U` ← src or dsrc = Nan
-  * IX ← 0
-  * UF ← 0
-  * FZ ← 0
-  * OF ← 0
-  * IN ← 0
+  * `IX` ← 0
+  * `UF` ← 0
+  * `FZ` ← 0
+  * `OF` ← 0
+  * `IN` ← 0
 
 Exceptions:
   * none
@@ -953,18 +948,18 @@ Operation:
   CONVERT (src) → des
 ```
 Flags:  (All Operations)
-  * C ← C  (when des is INTEGER)
-  * C ← des < 0 (when des is FLOATING POINT)
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← Integer overflow (when des is INTEGER)
-  * V ← 0  (when des is FLOATING POINT)
+  * `C` ← `C`  (when des is INTEGER)
+  * `C` ← des < 0 (when des is FLOATING POINT)
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow (when des is INTEGER)
+  * `V` ← 0  (when des is FLOATING POINT)
   * `U` ← 0
-  * IX ← des rounded
-  * UF ← des underflowed
-  * FZ ← 0
-  * OF ← des overflowed
-  * IN ← src = Nan
+  * `IX` ← des rounded
+  * `UF` ← des underflowed
+  * `FZ` ← 0
+  * `OF` ← des overflowed
+  * `IN` ← src = Nan
 
 Exceptions:
   * Integer overflow [CVWB,CVWH,CVRW,CVLW]
@@ -1022,23 +1017,23 @@ Operation:
   dsrc / src → des
 ```
 Flags:  (Integer Operations: DIVB,DIVH,DIVW)
-  * C ← C
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← Integer overflow
+  * `C` ← C
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Flags:  (Floating Point Operations: DIVR,DIVL)
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ← des rounded
-  * UF ← des underflowed
-  * FZ ← (src = 0 and des <> 0)
-  * OF ← des overflowed
-  * IN ← (src of dsrc = Nan) or (src and dsrc = 0)
+  * `IX` ← des rounded
+  * `UF` ← des underflowed
+  * `FZ` ← (src = 0 and des <> 0)
+  * `OF` ← des overflowed
+  * `IN` ← (src of dsrc = Nan) or (src and dsrc = 0)
 
 Exceptions:
   * Integer overflow (dsrc = largest negative value, src = -1)
@@ -1073,22 +1068,22 @@ Operation:
   src / dsrc → des
 ```
 Flags:  (Integer Operations: DVRB,DVRH,DVRW)
-  * C ← C
-  * N ← des < 0Z ← des = 0
-  * V ← Integer overflow
+  * `C` ← C
+  * `N` ← des < 0Z ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Flags:  (Floating Point Operations: DVRR,DVRL)
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ← des rounded
-  * UF ← des underflowed
-  * FZ ← (des = 0 and src <> 0)
-  * OF ← des overflowed
-  * IN ← (src or dsrc = Nan) or (src and dsrc = 0)
+  * `IX` ← des rounded
+  * `UF` ← des underflowed
+  * `FZ` ← (des = 0 and src <> 0)
+  * `OF` ← des overflowed
+  * `IN` ← (src or dsrc = Nan) or (src and dsrc = 0)
 
 Exceptions:
   * Integer overflow (src = largest negative value, dsrc = 1)
@@ -1156,7 +1151,7 @@ Exceptions:
 
 #### FFO - FIND FIRST ONE
 If the source is zero the destination is set to 8 (FFOB), 16 (FFOH) or
-32 (FFOW) and the Z Flag is set to one. Otherwise, Z is zero and the
+32 (FFOW) and the `Z` Flag is set to one. Otherwise, `Z` is zero and the
 destination is set to the bit position of the first one bit in the
 source, scanning from the right (e.g. if the least significant bit is
 one the destination is set to zero). The destination is a Byte even
@@ -1177,10 +1172,10 @@ Operation:
   location of first one (src) → des
 ```
 Flags:
-  * C ← C
-  * N ← 0
-  * Z ← src = 0
-  * V ← 0
+  * `C` ← C
+  * `N` ← 0
+  * `Z` ← src = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -1320,8 +1315,8 @@ Exceptions:
 #### MOVA - MOVE ADDRESS
 The address specifier of the source operand is evaluated and stored at
 the destination location. If the addressing mode of the source is
-Literal, Immediate or Register Direct the PC is first added to the
-source value. The value of PC used is that at the beginning of the
+Literal, Immediate or Register Direct the `PC` is first added to the
+source value. The value of `PC` used is that at the beginning of the
 instruction. If the source addressing mode is Stack mode then the
 contents of the Stack Pointer are moved to the destination.
 
@@ -1373,23 +1368,23 @@ Operation:
   src * dsrc → des
 ```
 Flags:  (Integer Operations: MULB,MULH,MULW)
-  * C ← C
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← Integer overflow
+  * `C` ← C
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Flags:  (Floating Point Operatios: MULR,MULL)
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ← des rounded
-  * UF ← des underflowed
-  * FZ ← 0
-  * OF ← des overflowed
-  * IN ← dsrc or src = Nan
+  * `IX` ← des rounded
+  * `UF` ← des underflowed
+  * `FZ` ← 0
+  * `OF` ← des overflowed
+  * `IN` ← dsrc or src = Nan
 
 Exceptions:
   * Integer overflow
@@ -1423,23 +1418,23 @@ Operation:
   -(src) → des
 ```
 Flags:  (Integer Operations: NEGB,NEGH,NEGW)
-  * C ← borrow from most significant bit
-  * N ← des ← 0    TODO - verify this
-  * Z ← des = 0
-  * V ← Integer overflow
+  * `C` ← borrow from most significant bit
+  * `N` ← des ← 0    TODO - verify this
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Flags:  (Floating Point Operations: NEGR,NEGL)
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ← 0
-  * UF ← 0
-  * FZ ← 0
-  * OF ← 0
-  * IN ← src = Nan
+  * `IX` ← 0
+  * `UF` ← 0
+  * `FZ` ← 0
+  * `OF` ← 0
+  * `IN` ← src = Nan
 
 Exceptions:
   * Integer overflow
@@ -1491,10 +1486,10 @@ Operation:
   NOT(src) → des
 ```
 Flags:
-  * C ← C
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← C
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -1522,10 +1517,10 @@ Operation:
   src OR dsrc → des
 ```
 Flags:
-  * C ← C
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← C
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -1538,8 +1533,8 @@ Exceptions:
 The remainder of the destination divided by the source replaces the
 destination. The following point instruction is used for argument
 reduction and is always exact. However, it is only a partial remainder;
-the instruction must be repeated until Z becomes one (that is the
-reason for the unusual definition of the Z flag).
+the instruction must be repeated until `Z` becomes one (that is the
+reason for the unusual definition of the `Z` flag).
 
 Opcodes:
 ```
@@ -1558,23 +1553,23 @@ Operation:
   dsrc REM src → des
 ```
 Flags:  (integer Operations: REMB,REMH,REMW)
-  * C ← C
-  * N ← des < 0
-  * Z ←  des = 0
-  * V ← 0
+  * `C` ← C
+  * `N` ← des < 0
+  * `Z` ←  des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Flags:  (Floating Point Operations: REMR,REML)
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← abs(des) < abs(src)
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← abs(des) < abs(src)
+  * `V` ← 0
   * `U` ← 0
-  * IX ← 0
-  * UF ← des underflowed
-  * FZ ← 0
-  * OF ← 0
-  * IN ← (dsrc or src = Nan) or (src = 0)
+  * `IX` ← 0
+  * `UF` ← des underflowed
+  * `FZ` ← 0
+  * `OF` ← 0
+  * `IN` ← (dsrc or src = Nan) or (src = 0)
 
 Exceptions:
   * Integer Zero Divide
@@ -1591,9 +1586,9 @@ instruction following the repeat is reexecuted and the indicated count
 register (src must be a general register designator) is decremented
 until the repeat condition is satisfied. One of the conditions for
 all three instructions is that the count register becomes zero. But if
-the Z flag becomes zero (REPZ) or one (REPNZ) then the condition is
+the `Z` flag becomes zero (REPZ) or one (REPNZ) then the condition is
 also satisfied and the repeat is terminated by setting bits 30 and 31
-in the PS register to 0. The Z flag is checked (for REPZ and RPNZ)
+in the `PS` register to 0. The `Z` flag is checked (for REPZ and RPNZ)
 before the Count register is decremented so that it will correctly count
 the number of times the following instruction is executed. If the
 Count is initially zero the following instruction is skipped. If
@@ -1638,11 +1633,11 @@ REP{,Z,NZ} src
 Operation:
 ```
   REP: PS(30,31) ← 01; Count = REG#(src)
-  REPZ: PS(30,31) ← 10; Count = REG#(src); Z = 1
-  REPNZ: PS(30,31) ← 11; Count = REG#(src); Z = 0
+  REPZ: PS(30,31) ← 10; Count = REG#(src); `Z` = 1
+  REPNZ: PS(30,31) ← 11; Count = REG#(src); `Z` = 0
     for all: PS(26,27,28,29) ← Count
       after repeat condition satisfied (on REPZ and RPNZ
-      the Z flag is checked before the Count)
+      the `Z` flag is checked before the Count)
       PS(30,31) ← 00
 ```
 
@@ -1681,8 +1676,8 @@ Exceptions:
 ----
 
 #### RETI - RETURN FROM INTERRUPT
-The top of stack (assumed to contain the PC in effect before the current
-interrupt) is popped into the PC register and then the next value on
+The top of stack (assumed to contain the `PC` in effect before the current
+interrupt) is popped into the `PC` register and then the next value on
 the stack is popped into the Program Status (PS) register.
 
 Opcode:
@@ -1757,11 +1752,11 @@ Operation:
   dsrc ROTATE BY src → des
 ```
 Flags:
-  * C ← if src = 0 then the least significant bit of des,
+  * `C` ← if src = 0 then the least significant bit of des,
     otherwise the last bit shifted out
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -1816,10 +1811,10 @@ Operation:
   dsrc - src - Carry → des
 ```
 Flags:
-  * C ← borrow from most significant bit
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← Integer overflow
+  * `C` ← borrow from most significant bit
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Exceptions:
@@ -1847,10 +1842,10 @@ Operation:
   dsrc - src - Carry → des
 ```
 Flags:
-  * C ← borrow from most significant digit
-  * N ← 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← borrow from most significant digit
+  * `N` ← 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -1880,23 +1875,23 @@ Operation:
   src - dsrc → des
 ```
 Flags:  (Integer Operations: SBRB,SBRH,SBRW)
-  * C ← borrow from most significant bit
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← Integer overflow
+  * `C` ← borrow from most significant bit
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Flags:  (Floating Point Operations: SBRR,SBRL)
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ←  des rounded
-  * UF ← des underflowed
-  * FZ ← 0
-  * OF ← des overflowed
-  * IN ← src or dsrc = Nan
+  * `IX` ←  des rounded
+  * `UF` ← des underflowed
+  * `FZ` ← 0
+  * `OF` ← des overflowed
+  * `IN` ← src or dsrc = Nan
 
 Exceptions:
   * Integer overflow
@@ -1937,11 +1932,11 @@ Operation:
   dsrc SHIFT ARITHMETIC BY src ← des
 ```
 Flags:
-  * C ← if src = 0 then least significant bit (dsrc)
+  * `C` ← if src = 0 then least significant bit (dsrc)
     otherwise last bit shifted out
-  * N ← src < 0
-  * Z ← des = 0
-  * V ← Integer overflow
+  * `N` ← src < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Exceptions:
@@ -1977,11 +1972,11 @@ Operation:
   dsrc SHIFT LOGICAL BY src → des
 ```
 Flags:
-  * C ← if src = 0 then least significant bit (dsrc)
+  * `C` ← if src = 0 then least significant bit (dsrc)
     otherwise last bit shifted out
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -2007,16 +2002,16 @@ Operation:
   SIGN (src) → SIGN (des)
 ```
 Flags:
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ← 0
-  * UF ←  0
-  * FZ ← 0
-  * OF ← 0
-  * IN ← src or dsrc = Nan
+  * `IX` ← 0
+  * `UF` ←  0
+  * `FZ` ← 0
+  * `OF` ← 0
+  * `IN` ← src or dsrc = Nan
 
 Exceptions:
   * Invalid
@@ -2042,16 +2037,16 @@ Operation:
   SQUARE ROOT (src) → des
 ```
 Flags:
-  * C ← 0
-  * N ← 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← 0
+  * `N` ← 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ← des rounded
-  * UF ← 0
-  * FZ ← 0
-  * OF ← 0
-  * IN ← (src < 0) or (src = Nan)
+  * `IX` ← des rounded
+  * `UF` ← 0
+  * `FZ` ← 0
+  * `OF` ← 0
+  * `IN` ← (src < 0) or (src = Nan)
 
 Exceptions:
   * Inexact
@@ -2076,7 +2071,7 @@ Operation:
   1 → Carry
 ```
 Flags:
-  * C ← 1   no other changes
+  * `C` ← 1   no other changes
 
 Exceptions:
   * none
@@ -2117,10 +2112,10 @@ Operation:
   PROCESSOR REGISTER # (src) → des
 ```
 Flags:
-  * C ← C
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← C
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
@@ -2150,23 +2145,23 @@ Operation:
   dsrc - src → des
 ```
 Flags:  (Integer Operations: SUBB,SUBH,SUBW)
-  * C ← borrow from most significant bit
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← Integer overflow
+  * `C` ← borrow from most significant bit
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← Integer overflow
   * `U` ← 0
 
 Flags:  (Floating Point Operations: SUBR,SUBL)
-  * C ← des < 0
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← des < 0
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
-  * IX ← des rounded
-  * UF ← des underflowed
-  * FZ ← 0
-  * OF ← des overflowed
-  * IN ← src or dsrc = Nan
+  * `IX` ← des rounded
+  * `UF` ← des underflowed
+  * `FZ` ← 0
+  * `OF` ← des overflowed
+  * `IN` ← src or dsrc = Nan
 
 Exceptions:
   * Integer overflow
@@ -2179,8 +2174,8 @@ Exceptions:
 ----
 
 #### TRAP - TRAP
-The current values of PS and PC are pushed on the stack and the value
-at location (8 * src) replaces the PC while the value at location (8 *
+The current values of `PS` and `PC` are pushed on the stack and the value
+at location (8 * src) replaces the `PC` while the value at location (8 *
 src + 4) replaces the PS. The source operand is an unsigned Byte.
 
 Opcode:
@@ -2200,7 +2195,7 @@ Operation:
     PS ← Word at location (8 * src + 4)
 ```
 Flags:
-  * all flags set according to the new PS value
+  * all flags set according to the new `PS` value
 
 Exceptions:
   * none
@@ -2252,10 +2247,10 @@ Operation:
   src XOR dsrc → des
 ```
 Flags:
-  * C ← C
-  * N ← des < 0
-  * Z ← des = 0
-  * V ← 0
+  * `C` ← C
+  * `N` ← des < 0
+  * `Z` ← des = 0
+  * `V` ← 0
   * `U` ← 0
 
 Exceptions:
