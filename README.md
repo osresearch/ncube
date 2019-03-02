@@ -24,7 +24,8 @@ sections:
 * [Data Processor Implementation](implementation.md) (Section 8.1 - 8.11)
 * [Patent Claims and Citations](claims.md) (Section 8.12, Claims and Citations)
 
-## External links
+## References
+* [Backplane pinout](interface.md)
 * [More photos](https://www.flickr.com/photos/osr/albums/72157703742799362)
 * [nCUBE on wikipedia](https://en.wikipedia.org/wiki/NCUBE)
-
+* [nCube and the rise of the hypercubes](http://www.cpushack.com/2013/11/01/ncube-and-the-rise-of-the-hypercubes/)
